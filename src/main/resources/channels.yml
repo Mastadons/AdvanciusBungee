@@ -1,0 +1,70 @@
+configuredChannels:
+  - name: global
+    guard:
+      readPermission: advancius.channel.global.read
+      sendPermission: advancius.channel.global.send
+    defaultFormatter:
+      senderFormat: "{sender.permissions.getPrefix}{sender.metadata.getNameColor}{sender.bungeecord.proxiedPlayer.getName}{sender.permissions.getSuffix} &7» {sender.metadata.getChatColor}{message}"
+      readerFormat: "{sender.permissions.getPrefix}{sender.metadata.getNameColor}{sender.bungeecord.proxiedPlayer.getName}{sender.permissions.getSuffix} &7» {sender.metadata.getChatColor}{message}"
+    metadata:
+      internal:
+        cooldown: 2000
+        command: true
+        commandAliases: ["gc", "g", "ac"]
+  - name: staff
+    guard:
+      readPermission: advancius.channel.staff.read
+      sendPermission: advancius.channel.staff.send
+    defaultFormatter:
+      senderFormat: "&9SC> &e{sender.bungeecord.proxiedPlayer.getName} &7» &f{message}"
+      readerFormat: "&2LC> &a{sender.bungeecord.proxiedPlayer.getName} &7» &f&o{message}"
+    metadata:
+      internal:
+        command: true
+        commandAliases: ["sc"]
+  - name: mature
+    guard:
+      readPermission: advancius.channel.mature.read
+      sendPermission: advancius.channel.mature.send
+    defaultFormatter:
+      senderFormat: "&4MC> &c{sender.bungeecord.proxiedPlayer.getName} &7» &f{message}"
+      readerFormat: "&2LC> &a{sender.bungeecord.proxiedPlayer.getName} &7» &f&o{message}"
+    metadata:
+      internal:
+        command: true
+        commandAliases: ["ma", "mc", "16p", "18p"]
+  - name: local
+    guard:
+      readPermission: advancius.channel.local.read
+      sendPermission: advancius.channel.local.send
+    defaultFormatter:
+      senderFormat: "&2LC> &a{sender.bungeecord.proxiedPlayer.getName} &7» &f&o{message}"
+      readerFormat: "&2LC> &a{sender.bungeecord.proxiedPlayer.getName} &7» &f&o{message}"
+    metadata:
+      internal:
+        command: true
+        commandAliases: ["lc"]
+  - name: hug
+    guard:
+      readPermission: advancius.hug
+      sendPermission: advancius.hug
+    defaultFormatter:
+      senderFormat: "&eYou have hugged &a{reader.bungeecord.proxiedPlayer.getName}&e!"
+      readerFormat: "&eAww! &a{sender.bungeecord.proxiedPlayer.getName} &ehas hugged you!"
+    metadata:
+      internal:
+        command: true
+        argumentReader: true
+  - name: slap
+    guard:
+      readPermission: advancius.slap
+      sendPermission: advancius.slap
+    defaultFormatter:
+      senderFormat: "&eYou have slapped &c{reader.bungeecord.proxiedPlayer.getName}&e! &cI bet that hurt..."
+      readerFormat: "&eYou have been slapped by &c{sender.bungeecord.proxiedPlayer.getName}&e! &cOuch..."
+    metadata:
+      internal:
+        command: true
+        commandAliases: [smack, hit]
+        argumentReader: true
+defaultChannel: global

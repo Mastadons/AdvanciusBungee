@@ -1,0 +1,36 @@
+port: 4452
+debugExceptions: true
+serverProcessing: ["server_b"]
+defaultChatColor: WHITE
+defaultNameColor: WHITE
+colorAliases:
+  BLACK: ["0", "&0"]
+  DARK_BLUE: ["1", "&1", "darkblue"]
+  DARK_GREEN: ["2", "&2", "darkgreen"]
+  DARK_AQUA: ["3", "&3", "cyan", "darkaqua"]
+  DARK_RED: ["4", "&4", "darkred"]
+  DARK_PURPLE: ["5", "&5", "darkpurple"]
+  GOLD: ["6", "&6"]
+  GRAY: ["7", "&7"]
+  DARK_GRAY: ["8", "&8", "darkgray"]
+  BLUE: ["9", "&9"]
+  GREEN: ["a", "&a", "lime"]
+  AQUA: ["b", "&b", "lightblue"]
+  RED: ["c", "&c"]
+  LIGHT_PURPLE: ["d", "&d", "magenta"]
+  YELLOW: ["e", "&e"]
+  WHITE: ["f", "&f"]
+  MAGIC: ["k", "&k"]
+  BOLD: ["l", "&l"]
+  STRIKETHROUGH: ["m", "&m", "cross"]
+  UNDERLINE: ["n", "&n"]
+  ITALIC: ["o", "&o"]
+  RESET: ["r", "&r"]
+allowedNameColor: ["DARK_BLUE", "DARK_GREEN", "DARK_AQUA", "DARK_RED", "DARK_PURPLE", "GOLD", "GRAY", "DARK_GRAY", "BLUE", "GREEN", "AQUA", "RED", "LIGHT_PURPLE", "YELLOW", "WHITE"]
+allowedChatColor: ["DARK_BLUE", "DARK_GREEN", "DARK_AQUA", "DARK_RED", "DARK_PURPLE", "GOLD", "GRAY", "DARK_GRAY", "BLUE", "GREEN", "AQUA", "RED", "LIGHT_PURPLE", "YELLOW", "WHITE"]
+commandSpyIgnore: ["dm", "pm", "msg", "message", "w", "whisper", "privatemessage", "tell", "dr", "pr", "msgr", "r", "messagereply", "wr", "whisperreply", "privatereply", "tellr", "c"]
+silentMoveServers: ["server_c"]
+maxNicknameLength: 24
+minNicknameLength: 3
+eightBallChannel: global
+eightBallCooldown: 30000
