@@ -111,7 +111,7 @@ public class ChannelManager implements Listener, CommunicationListener {
         return generateMessage(sender, getChannel(sender), message, AdvanciusBungee.getInstance().getPersonManager().getOnlinePersons());
     }
 
-    public List<ChannelMessage> generateMessage(Person sender, Channel channel, String message, List<Person> readers) {
+    public synchronized List<ChannelMessage> generateMessage(Person sender, Channel channel, String message, List<Person> readers) {
         List<ChannelMessage> messageList = new ArrayList<>();
 
         MessageGenerateEvent messageGenerateEvent = AdvanciusBungee.getInstance().getEventManager().generateEvent(MessageGenerateEvent.class, this, sender, channel, message, readers);
