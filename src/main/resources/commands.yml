@@ -2,121 +2,111 @@ debugExceptions: true
 commands:
   - name: advanciuschat
     permission: advancius.admin
-    syntax: ""
-    description: ""
+    syntax: "/advanciuschat"
+    description: "Sends a nice message about Advancius Chat"
     aliases: ["ac"]
   - name: chatcolor
     permission: advancius.chatcolor
-    syntax: ""
-    description: ""
+    syntax: "/chatcolor <color>"
+    description: "Sets your chat color to the provided color"
     aliases: ["ccolor"]
   - name: namecolor
     permission: advancius.namecolor
-    syntax: ""
-    description: ""
+    syntax: "/namecolor <color>"
+    description: "Sets your name color to the provided color"
     aliases: ["ncolor"]
   - name: commandspy
     permission: advancius.commandspy
-    syntax: ""
-    description: ""
+    syntax: "/commandspy"
+    description: "Toggles your ability to see others' commands"
     aliases: ["cs"]
   - name: dump
     permission: advancius.dump
-    syntax: ""
-    description: ""
+    syntax: "/dump"
+    description: "Developer utility to view data about players"
     aliases: []
   - name: directmessage
     permission: advancius.directmessage
-    syntax: ""
-    description: ""
+    syntax: "/directmessage <player> <message>"
+    description: "Sends a private message to another player"
     aliases: ["dm", "pm", "msg", "message", "w", "whisper", "privatemessage", "tell"]
   - name: directreply
     permission: advancius.directreply
-    syntax: ""
-    description: ""
+    syntax: "/directreply <message>"
+    description: "Responds to a private message"
     aliases: ["dr", "pr", "msgr", "r", "messagereply", "wr", "whisperreply", "privatereply", "tellr"]
   - name: directcontinue
     permission: advancius.directcontinue
-    syntax: ""
-    description: ""
+    syntax: "/directcontinue <message>"
+    description: "Continues an existing private message"
     aliases: ["c"]
   - name: chatclear
     permission: advancius.chatclear
-    syntax: ""
-    description: ""
+    syntax: "/chatclear"
+    description: "Clears the chat"
     aliases: ["cc", "clearchat"]
   - name: chatlock
     permission: advancius.chatlock
-    syntax: ""
-    description: ""
+    syntax: "/chatlock <channel>"
+    description: "Prevents players from chatting in a specific channel"
     aliases: ["cl"]
   - name: ignorechannel
     permission: advancius.ignorechannel
-    syntax: ""
-    description: ""
+    syntax: "/ignorechannel <channel>"
+    description: "Prevents you from receiving messages from a channel"
     aliases: ["ic"]
   - name: ignore
     permission: advancius.ignore
-    syntax: ""
-    description: ""
-    aliases: []
-  - name: commandspy
-    permission: advancius.commandspy
-    syntax: ""
-    description: ""
+    syntax: "/ignore <player>"
+    description: "Ignores or unignores a player"
     aliases: []
   - name: socialspy
     permission: advancius.socialspy
-    syntax: ""
-    description: ""
+    syntax: "/socialspy"
+    description: "Toggles your ability to see private messages between players"
     aliases: []
   - name: silent
     permission: advancius.silent
-    syntax: ""
-    description: ""
+    syntax: "/silent"
+    description: "Silences your join, move, and quit messages"
     aliases: ["silentswitch", "silentjoin", "sh"]
   - name: nickname
     permission: advancius.nickname
-    syntax: ""
-    description: ""
+    syntax: "/nickname <name>"
+    description: "Sets a custom name for you tto go by in enabled channels"
     aliases: ["nickname", "nick", "fakename"]
   - name: stafflist
     permission: advancius.stafflist
-    syntax: ""
-    description: ""
+    syntax: "/stafflist"
+    description: "View all staff currently online"
     aliases: ["staff", "sl"]
-  - name: reconnectserver
-    permission: advancius.reconnectserver
-    syntax: ""
-    description: ""
-    aliases: ["rc", "reconnect"]
-  - name: customformat
-    permission: advancius.customformat
-    syntax: ""
-    description: ""
-    aliases: ["cf", "channelformat"]
   - name: eightball
     permission: advancius.eightball
-    syntax: ""
-    description: ""
+    syntax: "/eightball <message>"
+    description: "Receive wisdom from the Magic Eight Ball"
     aliases: ["8b", "8ball"]
   - name: shrug
     permission: advancius.emotes
-    syntax: ""
-    description: ""
+    syntax: "/shrug"
+    description: "Shrugs in chat."
     aliases: []
   - name: tableflip
     permission: advancius.tableflip
-    syntax: ""
-    description: ""
+    syntax: "/tablefip"
+    description: "Flips a table."
     aliases: ["tf"]
   - name: untableflip
     permission: advancius.untableflip
-    syntax: ""
-    description: ""
+    syntax: "/untableflip"
+    description: "Unflips a table."
     aliases: ["utf", "unflip"]
   - name: advanciuschat.reload
     permission: advancius.admin.reload
-    syntax: ""
-    description: ""
+    syntax: "/advanciuschat reload"
+    description: "Reloads the Advancius Chat configuration"
+    aliases: ["rl"]
+  - name: advanciuschat.help
+    permission: advancius.admin.help
+    syntax: "/advanciuschat help"
+    description: "Shows you all commands that you can do"
     aliases: []

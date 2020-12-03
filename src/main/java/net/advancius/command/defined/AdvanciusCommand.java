@@ -4,6 +4,7 @@ import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusConfiguration;
 import net.advancius.AdvanciusLang;
 import net.advancius.channel.ChannelConfiguration;
+import net.advancius.command.CommandConfiguration;
 import net.advancius.command.CommandDescription;
 import net.advancius.command.CommandHandler;
 import net.advancius.command.CommandListener;
@@ -11,6 +12,7 @@ import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
 import net.advancius.person.context.BungeecordContext;
+import net.advancius.person.context.PermissionContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.utils.ColorUtils;
 
@@ -37,6 +39,15 @@ public class AdvanciusCommand implements CommandListener {
             bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
         } catch (FileNotFoundException exception) {
             throw new Exception("Encountered error reloading", exception);
+        }
+    }
+
+    @CommandHandler(description = "advanciuschat.help")
+    public void onHelpCommand(Person person, CommandDescription description, String[] arguments) throws Exception {
+        BungeecordContext.sendMessage(person, "&6&lAdvanciusChat Help Page");
+        for (CommandDescription commandDescription : CommandConfiguration.getInstance().getCommands()) {
+            if (!PermissionContext.hasPermission(person, commandDescription.getPermission())) continue;
+            BungeecordContext.sendMessage(person, "&e" + commandDescription.getSyntax() + " &7» &f" + commandDescription.getDescription());
         }
     }
 
