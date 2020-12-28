@@ -8,7 +8,6 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -35,12 +34,10 @@ public class DumpCommand implements CommandListener {
             target = AdvanciusBungee.getInstance().getPersonManager().getPerson(UUID.fromString(commandFlags.getFlag("uuid").getValue()));
         }
 
-        PlaceholderComponent placeholderComponent = new PlaceholderComponent("{target." + commandFlags.getFlag("path").getValue() + '}');
-        placeholderComponent.setReplaceJson(commandFlags.hasFlag("json"));
-        placeholderComponent.replace("target", target);
-        placeholderComponent.translateColor();
-
-        BungeecordContext bungeecordContext = person.getContextManager().getContext("bungeecord");
-        bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+        PlaceholderComponent component = new PlaceholderComponent("{target." + commandFlags.getFlag("path").getValue() + '}');
+        component.setReplaceJson(commandFlags.hasFlag("json"));
+        component.replace("target", target);
+        component.translateColor();
+        component.send(person);
     }
 }

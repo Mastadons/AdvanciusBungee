@@ -8,6 +8,6 @@ import net.advancius.event.AbstractEvent;
 @Data
 public abstract class ChannelEvent extends AbstractEvent {
 
-    private final Channel channel;
-    private final ChannelManager channelManager;
+    protected final Channel channel;
+    protected final ChannelManager channelManager;
 }

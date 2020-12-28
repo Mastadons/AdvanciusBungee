@@ -8,7 +8,7 @@ import net.advancius.event.EventListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.person.context.PermissionContext;
 import net.advancius.person.event.PersonJoinEvent;
@@ -29,42 +29,42 @@ public class SilentListener implements EventListener {
 
     @EventHandler(5)
     public void onPersonJoin(PersonJoinEvent event) throws IllegalAccessException {
-        BungeecordContext bungeecordContext = event.getPerson().getContextManager().getContext(BungeecordContext.class);
-        MetadataContext metadata = event.getPerson().getContextManager().getContext("metadata");
+        ConnectionContext connection = event.getPerson().getContextManager().getContext(ConnectionContext.class);
+        MetadataContext metadata = event.getPerson().getContextManager().getContext(MetadataContext.class);
         if (metadata.isSilent()) {
             PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().silentJoin);
             component.replace("person", event.getPerson());
             component.translateColor();
 
-            broadcastSilent(component.toTextComponentUnsafe());
+            broadcastSilent(component.toTextComponent());
         }
     }
 
     @EventHandler(5)
     public void onPersonQuit(PersonQuitEvent event) {
-        MetadataContext metadata = event.getPerson().getContextManager().getContext("metadata");
+        MetadataContext metadata = event.getPerson().getContextManager().getContext(MetadataContext.class);
         if (metadata.isSilent()) {
             PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().silentQuit);
             component.replace("person", event.getPerson());
             component.translateColor();
 
-            broadcastSilent(component.toTextComponentUnsafe());
+            broadcastSilent(component.toTextComponent());
         }
     }
 
     @EventHandler(5)
     public void onPersonMove(PersonMoveEvent event) {
-        MetadataContext metadata = event.getPerson().getContextManager().getContext("metadata");
-        BungeecordContext bungeecordContext = event.getPerson().getContextManager().getContext("bungeecord");
+        MetadataContext metadata = event.getPerson().getContextManager().getContext(MetadataContext.class);
+        ConnectionContext connection = event.getPerson().getContextManager().getContext(ConnectionContext.class);
 
-        if ((metadata.isSilent() || AdvanciusConfiguration.getInstance().silentMoveServers.contains(bungeecordContext.getServer().getName())) && metadata.getTransientMetadata().hasMetadata("ending_server")) {
+        if ((metadata.isSilent() || AdvanciusConfiguration.getInstance().silentMoveServers.contains(connection.getServer().getName())) && metadata.getTransientMetadata().hasMetadata("ending_server")) {
             PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().silentMove);
             component.replace("person", event.getPerson());
-            component.replace("server", bungeecordContext.getProxiedPlayer().getServer().getInfo());
+            component.replace("server", connection.getServer());
             component.translateColor();
 
-            TextComponent textComponent = component.toTextComponentUnsafe();
-            textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + bungeecordContext.getServer().getName()));
+            TextComponent textComponent = component.toTextComponent();
+            textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + connection.getServer().getName()));
             textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("Click to follow to server")));
 
             broadcastSilent(textComponent);
@@ -76,7 +76,7 @@ public class SilentListener implements EventListener {
             PermissionContext permissionContext = onlinePerson.getContextManager().getContext(PermissionContext.class);
 
             if (!permissionContext.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("silent").getPermission())) continue;
-            onlinePerson.getContextManager().getContext(BungeecordContext.class).sendMessage(component);
+            onlinePerson.getContextManager().getContext(ConnectionContext.class).sendMessage(component);
         }
     }
 }

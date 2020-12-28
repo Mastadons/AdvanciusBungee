@@ -14,7 +14,7 @@ import net.advancius.communication.client.Client;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.person.context.PermissionContext;
 import net.advancius.protocol.Protocol;
@@ -58,26 +58,7 @@ public class ChannelManager implements Listener, CommunicationListener {
         if (isServerProcessing(server.getInfo())) return;
         event.setCancelled(true);
 
-        BungeecordContext bungeecord = person.getContextManager().getContext(BungeecordContext.class);
-        PermissionContext permission = person.getContextManager().getContext(PermissionContext.class);
-
-        ConfiguredChannel shortcutChannel = getShortcutChannel(person, message);
-        ConfiguredChannel channel = getChannel(person);
-        if (shortcutChannel != null) {
-            channel = shortcutChannel;
-            message = message.substring(1);
-        }
-
-        if (channel.getMetadata().hasMetadata("local", true)) return;
-
-        if (channel.getMetadata().hasMetadata("locked", true) && !permission.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("chatlock").getPermission())) {
-            person.getContextManager().getContext(BungeecordContext.class).sendMessage(ColorUtils.toTextComponent(AdvanciusLang.getInstance().cannotChatLocked));
-            return;
-        }
-        List<ChannelMessage> messageList = generateMessage(person, channel, message, AdvanciusBungee.getInstance().getPersonManager().getOnlinePersons());
-
-        AdvanciusLogger.info(String.format("[Chat] (%s) %s: %s", channel.getName(), bungeecord.getProxiedPlayer().getName(), message));
-        messageList.forEach(ChannelMessage::send);
+        handleNaturalChat(person, message);
     }
 
     @CommunicationHandler(code = Protocol.CLIENT_CHAT)
@@ -87,7 +68,11 @@ public class ChannelManager implements Listener, CommunicationListener {
         Person person = AdvanciusBungee.getInstance().getPersonManager().getPerson(personId);
         String message = communicationPacket.getMetadata().getMetadata("message");
 
-        BungeecordContext bungeecord = person.getContextManager().getContext("bungeecord");
+        handleNaturalChat(person, message);
+    }
+
+    private void handleNaturalChat(Person person, String message) {
+        ConnectionContext connection = person.getContextManager().getContext(ConnectionContext.class);
         PermissionContext permission = person.getContextManager().getContext(PermissionContext.class);
 
         ConfiguredChannel shortcutChannel = getShortcutChannel(person, message);
@@ -97,13 +82,13 @@ public class ChannelManager implements Listener, CommunicationListener {
             message = message.substring(1);
         }
         if (channel.getMetadata().hasMetadata("locked", true) && !permission.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("chatlock").getPermission())) {
-            person.getContextManager().getContext(BungeecordContext.class).sendMessage(ColorUtils.toTextComponent(AdvanciusLang.getInstance().cannotChatLocked));
+            connection.sendMessage(ColorUtils.toTextComponent(AdvanciusLang.getInstance().cannotChatLocked));
             return;
         }
 
         List<ChannelMessage> messageList = generateMessage(person, channel, message, AdvanciusBungee.getInstance().getPersonManager().getOnlinePersons());
 
-        AdvanciusLogger.info(String.format("[Redirected-Chat] (%s) %s: %s", channel.getName(), bungeecord.getProxiedPlayer().getName(), message));
+        AdvanciusLogger.info(String.format("[Chat] (%s) %s: %s", channel.getName(), connection.getConnectionName(), message));
         messageList.forEach(ChannelMessage::send);
     }
 
@@ -112,29 +97,11 @@ public class ChannelManager implements Listener, CommunicationListener {
     }
 
     public synchronized List<ChannelMessage> generateMessage(Person sender, Channel channel, String message, List<Person> readers) {
-        List<ChannelMessage> messageList = new ArrayList<>();
-
         MessageGenerateEvent messageGenerateEvent = AdvanciusBungee.getInstance().getEventManager().generateEvent(MessageGenerateEvent.class, this, sender, channel, message, readers);
         AdvanciusBungee.getInstance().getEventManager().executeEvent(messageGenerateEvent);
 
-        if (messageGenerateEvent.isCancelled()) return messageList;
-        sender = messageGenerateEvent.getSender();
-        channel = messageGenerateEvent.getChannel();
-        message = messageGenerateEvent.getMessage();
-        readers = messageGenerateEvent.getReaders();
-
-        for (Person reader : readers) {
-            MetadataContext metadataContext = reader.getContextManager().getContext(MetadataContext.class);
-            if (channel instanceof ConfiguredChannel)
-                if (metadataContext.isIgnoringChannel(((ConfiguredChannel) channel).getName())) continue;
-
-            if (metadataContext.isIgnoring(sender.getId())) continue;
-            if (!channel.getGuard().canPersonSend(sender)) continue;
-            if (!sender.equals(reader) && !channel.getGuard().canPersonRead(reader)) continue;
-
-            messageList.add(new ChannelMessage(sender, reader, channel, message));
-        }
-        return messageList;
+        if (messageGenerateEvent.isCancelled()) return new ArrayList<>();
+        return messageGenerateEvent.generate();
     }
 
     private ConfiguredChannel getShortcutChannel(Person sender, String message) {
@@ -150,8 +117,7 @@ public class ChannelManager implements Listener, CommunicationListener {
     }
 
     public ConfiguredChannel getChannel(Person person) {
-        MetadataContext metadata = person.getContextManager().getContext("metadata");
-        Metadata persistentMetadata = metadata.getPersistentMetadata();
+        Metadata persistentMetadata = MetadataContext.getPersistentMetadata(person);
 
         if (persistentMetadata.hasMetadata("channel")) {
             ConfiguredChannel channel = getChannel(persistentMetadata.getMetadata("channel").toString());

@@ -5,7 +5,8 @@ import net.advancius.AdvanciusBungee;
 import net.advancius.file.FileManager;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
-import net.advancius.person.context.BungeecordContext;
+import net.advancius.person.context.ConnectionContext;
+import net.advancius.player.PlayerPerson;
 import net.advancius.person.event.PersonLoadEvent;
 import net.advancius.person.event.PersonSaveEvent;
 import net.advancius.event.Event;
@@ -14,7 +15,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class PersonManager {
         Person existentPerson = getPerson(id);
         if (existentPerson != null) return existentPerson;
 
-        Person person = new DefinedPerson(id);
+        Person person = new PlayerPerson(id);
 
         Event loadEvent = AdvanciusBungee.getInstance().getEventManager().generateEvent(PersonLoadEvent.class, person);
         AdvanciusBungee.getInstance().getEventManager().executeEvent(loadEvent);
@@ -73,15 +73,11 @@ public class PersonManager {
     }
 
     public void broadcastMessage(TextComponent component) {
-        personList.forEach(person -> person.getContextManager().getContext(BungeecordContext.class).sendMessage(component));
+        personList.forEach(person -> ConnectionContext.sendMessage(person, component));
     }
 
     public Person getOnlinePerson(String name) {
-        for (Person person : personList) {
-            ProxiedPlayer player = person.getContextManager().getContext(BungeecordContext.class).getProxiedPlayer();
-            if (player.getName().equalsIgnoreCase(name))return person;
-        }
-        return null;
+        return personList.stream().filter(person -> person.getContextManager().getContext(ConnectionContext.class).getConnectionName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     public UUID getOfflinePerson(String name) {
@@ -94,7 +90,7 @@ public class PersonManager {
                 if (!persistentMetadata.hasMetadata("last_username")) continue;
                 String username = persistentMetadata.getMetadata("last_username", String.class);
                 if (username.equalsIgnoreCase(name)) return UUID.fromString(personFile.getName().split("\\.")[0]);
-            } catch (Exception exception) {}
+            } catch (Exception ignored) {}
         }
         return null;
     }

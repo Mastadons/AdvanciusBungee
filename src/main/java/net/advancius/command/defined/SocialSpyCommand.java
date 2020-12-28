@@ -8,7 +8,6 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.placeholder.PlaceholderComponent;
 
@@ -23,15 +22,13 @@ public class SocialSpyCommand implements CommandListener {
 
     @CommandHandler(description = "socialspy")
     public void onCommand(Person person, CommandDescription description, String argument) throws Exception {
-        MetadataContext mc = person.getContextManager().getContext(MetadataContext.class);
-        mc.setSocialSpy(!mc.isSocialSpy());
+        MetadataContext metadata = person.getContextManager().getContext(MetadataContext.class);
+        metadata.setSocialSpy(!metadata.isSocialSpy());
 
-        PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().socialSpyToggle);
-        placeholderComponent.replace("status", mc.isSocialSpy() ? "enabled" : "disabled");
-        placeholderComponent.replace("person", person);
-        placeholderComponent.translateColor();
-
-        BungeecordContext bc = person.getContextManager().getContext(BungeecordContext.class);
-        bc.sendMessage(placeholderComponent.toTextComponentUnsafe());
+        PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().socialSpyToggle);
+        component.replace("status", metadata.isSocialSpy() ? "enabled" : "disabled");
+        component.replace("person", person);
+        component.translateColor();
+        component.send(person);
     }
 }

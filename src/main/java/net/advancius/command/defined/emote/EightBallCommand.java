@@ -12,16 +12,11 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.person.context.MetadataContext;
-import net.advancius.person.context.PermissionContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.utils.Commons;
-import net.luckperms.api.cacheddata.CachedMetaData;
 
 import java.util.List;
-
-import static net.advancius.person.context.MetadataContext.getTransientMetadata;
 
 @FlagManager.FlaggedClass
 public class EightBallCommand implements CommandListener {
@@ -44,7 +39,7 @@ public class EightBallCommand implements CommandListener {
         pc.translateColor();
 
         AdvanciusBungee.getInstance().getChannelManager().generateMessage(person, "Magic 8Ball, " + argument).forEach(ChannelMessage::send);
-        AdvanciusBungee.getInstance().getPersonManager().broadcastMessage(pc.toTextComponentUnsafe());
+        AdvanciusBungee.getInstance().getPersonManager().broadcastMessage(pc.toTextComponent());
         MetadataContext.getTransientMetadata(person).setMetadata("LastEightBall", System.currentTimeMillis());
     }
 

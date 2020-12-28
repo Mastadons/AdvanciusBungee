@@ -17,10 +17,10 @@ public class ContextManager {
     private final List<PersonContext> contextList = new ArrayList<>();
 
     public <T extends PersonContext> T getContext(Class<T> contextClass) {
-        return (T) contextList.stream().filter(context -> context.getClass() == contextClass).findFirst().orElse(null);
+        return (T) contextList.stream().filter(context -> contextClass.isAssignableFrom(context.getClass())).findFirst().orElse(null);
     }
 
-    public <T extends PersonContext> T getContext(String name) {
+    public <T extends PersonContext> T getNamedContext(String name) {
         return (T) contextList.stream().filter(context -> context.getName().equals(name)).findFirst().orElse(null);
     }
 

@@ -10,8 +10,8 @@ import net.advancius.command.ExternalCommand;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.person.context.ChannelContext;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -47,8 +47,8 @@ public class ChannelCommand extends ExternalCommand {
 
         Person person = AdvanciusBungee.getInstance().getPersonManager().getPersonUnsafe(sender);
 
-        ChannelContext channelContext = person.getContextManager().getContext("channel");
-        BungeecordContext bungeecordContext = person.getContextManager().getContext("bungeecord");
+        ChannelContext channelContext = person.getContextManager().getContext(ChannelContext.class);
+        ConnectionContext connectionContext = person.getContextManager().getContext(ConnectionContext.class);
 
         if (arguments.length == 0) {
             if (!channel.getMetadata().getMetadataOr("switchable", true)) {
@@ -56,7 +56,7 @@ public class ChannelCommand extends ExternalCommand {
                 placeholderComponent.replace("syntax", "/<channel> <message>");
                 placeholderComponent.translateColor();
 
-                bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+                connectionContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
                 return;
             }
             if (channelContext.getChannel().equals(channel)) {
@@ -64,7 +64,7 @@ public class ChannelCommand extends ExternalCommand {
                 placeholderComponent.replace("channel", channel);
                 placeholderComponent.translateColor();
 
-                bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+                connectionContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
                 return;
             }
             channelContext.setChannel(channel);
@@ -72,7 +72,7 @@ public class ChannelCommand extends ExternalCommand {
             placeholderComponent.replace("channel", channel);
             placeholderComponent.translateColor();
 
-            bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+            connectionContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
             return;
         }
         String message = String.join(" ", arguments);

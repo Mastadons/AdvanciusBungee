@@ -9,7 +9,7 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.utils.ColorUtils;
 
@@ -24,38 +24,26 @@ public class ChatLockCommand implements CommandListener {
     @CommandHandler(description = "chatlock")
     public void onCommand(Person person, CommandDescription description, String[] arguments) throws Exception {
         if (arguments.length == 0) {
-            PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().incorrectSyntax);
-            placeholderComponent.replace("syntax", "/chatlock <channel>");
-            placeholderComponent.translateColor();
-
-            BungeecordContext bungeecordContext = person.getContextManager().getContext("bungeecord");
-            bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+            PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().incorrectSyntax);
+            component.replace("syntax", "/chatlock <channel>");
+            component.translateColor();
+            component.send(person);
             return;
         }
+
         ConfiguredChannel channel = AdvanciusBungee.getInstance().getChannelManager().getChannel(arguments[0]);
         if (channel == null) {
-            BungeecordContext bungeecordContext = person.getContextManager().getContext("bungeecord");
-            bungeecordContext.sendMessage(ColorUtils.toTextComponent(AdvanciusLang.getInstance().unknownChannel));
+            ConnectionContext.sendMessage(person, ColorUtils.toTextComponent(AdvanciusLang.getInstance().unknownChannel));
             return;
         }
 
-        if (channel.getMetadata().hasMetadata("locked", true)) {
-            channel.getMetadata().setMetadata("locked", false);
+        channel.getMetadata().setMetadata("locked", !channel.getMetadata().hasMetadata("locked", true));
 
-            PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().chatUnlocked);
-            placeholderComponent.replace("person", person);
-            placeholderComponent.replace("channel", channel);
-            placeholderComponent.translateColor();
-            AdvanciusBungee.getInstance().getPersonManager().broadcastMessage(placeholderComponent.toTextComponentUnsafe());
-        }
-        else {
-            channel.getMetadata().setMetadata("locked", true);
-
-            PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().chatLocked);
-            placeholderComponent.replace("person", person);
-            placeholderComponent.replace("channel", channel);
-            placeholderComponent.translateColor();
-            AdvanciusBungee.getInstance().getPersonManager().broadcastMessage(placeholderComponent.toTextComponentUnsafe());
-        }
+        PlaceholderComponent component = new PlaceholderComponent(channel.getMetadata().hasMetadata("locked", true) ?
+                AdvanciusLang.getInstance().chatLocked : AdvanciusLang.getInstance().chatUnlocked);
+        component.replace("person", person);
+        component.replace("channel", channel);
+        component.translateColor();
+        AdvanciusBungee.getInstance().getPersonManager().broadcastMessage(component.toTextComponent());
     }
 }

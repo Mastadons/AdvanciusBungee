@@ -6,12 +6,15 @@ import net.advancius.AdvanciusConfiguration;
 import net.advancius.AdvanciusLogger;
 import net.advancius.communication.client.Client;
 import net.advancius.communication.client.ClientConnector;
+import net.advancius.communication.client.ClientCredentials;
+import net.advancius.encryption.AsymmetricEncryption;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.md_5.bungee.api.config.ServerInfo;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,11 +29,12 @@ import java.util.logging.Level;
 public class CommunicationManager {
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = 5)
-    private static void loadChannelManager() throws IOException {
+    private static void loadChannelManager() throws IOException, NoSuchAlgorithmException {
         AdvanciusLogger.info("Loading ChannelManager");
         CommunicationManager instance = new CommunicationManager();
+        instance.encryptionKeypair = AsymmetricEncryption.AsymmetricEncryptionKeypair.generateKeypair();
         instance.startCommunication();
-
+        
         AdvanciusBungee.getInstance().setCommunicationManager(instance);
     }
 
@@ -40,6 +44,8 @@ public class CommunicationManager {
         CommunicationManager instance = AdvanciusBungee.getInstance().getCommunicationManager();
         instance.stopCommunication();
     }
+
+    private AsymmetricEncryption.AsymmetricEncryptionKeypair encryptionKeypair;
 
     private final Map<UUID, AtomicReference<CommunicationPacket>> requestMap = new HashMap<>();
     private final List<CommunicationListener> listenerList = new ArrayList<>();
@@ -52,13 +58,13 @@ public class CommunicationManager {
     private final List<Client> clientList = new ArrayList<>();
 
     public void startCommunication() throws IOException {
+        AdvanciusLogger.info("Attempting to start server on port " + AdvanciusConfiguration.getInstance().port);
         serverSocket = new ServerSocket(AdvanciusConfiguration.getInstance().port);
-
-        AdvanciusLogger.info("Started communication server");
+        AdvanciusLogger.info("Started server, initializing client connector.");
 
         clientConnector = new ClientConnector(this);
         clientConnector.start();
-        AdvanciusLogger.info("Started client connector");
+        AdvanciusLogger.info("Started client connector.");
     }
 
     public void stopCommunication() throws IOException {
@@ -77,7 +83,7 @@ public class CommunicationManager {
         if (handleRequest(communicationPacket)) return;
 
         AdvanciusLogger.log(Level.INFO, "[Network] (%s) Incoming packet(%s) with code %d",
-                client.getName(), communicationPacket.getId().toString(), communicationPacket.getCode());
+                client.getCompleteName(), communicationPacket.getId().toString(), communicationPacket.getCode());
 
         listenerList.forEach(listener -> listener.getListenerMethods(communicationPacket.getCode()).forEach(method -> method.executeMethod(client, communicationPacket)));
     }
@@ -88,12 +94,28 @@ public class CommunicationManager {
         return false;
     }
 
-    public Client getClient(ServerInfo serverInfo) {
-        for (Client client : clientList)
-            if (client.getName() != null && client.getName().equalsIgnoreCase(serverInfo.getName())) return client;
+    public Client getClientFromServer(ServerInfo serverInfo) {
+        for (Client client : clientList) {
+            if (client.getCredentials() == null) continue;
+            if (client.getCredentials().isInternal() && client.getCredentials().getName().equalsIgnoreCase(serverInfo.getName())) return client;
+        }
         return null;
     }
 
+    public Client getClient(String key) {
+        for (Client client : clientList) {
+            if (client.getCredentials() == null) continue;
+            if (client.getCredentials().getKey().equals(key)) return client;
+        }
+        return null;
+    }
+
+    public ClientCredentials getCredentials(String key) {
+        for (ClientCredentials credentials : CredentialsConfiguration.getInstance().credentials.values()) {
+            if (credentials.getKey().equals(key)) return credentials;
+        }
+        return null;
+    }
     private boolean handleRequest(CommunicationPacket communicationPacket) {
         if (communicationPacket.getRespondingTo() == null) return false;
         requestMap.forEach((requestId, reference) -> {

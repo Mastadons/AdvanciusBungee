@@ -1,17 +1,20 @@
 package net.advancius;
 
-import lombok.Data;
-import net.advancius.placeholder.WildcardPlaceholder;
-import net.advancius.placeholder.PlaceholderComponent;
-
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 public class AdvanciusTest {
 
-    public static void main(String[] arguments) throws IOException {
-        String message = "Hello Clans_MC";
-        String username = "Clans_MC";
-
-        System.out.println(message.toLowerCase().contains(username.toLowerCase()));
+    public static void main(String[] arguments) throws IOException, NoSuchAlgorithmException {
+        for (int i = 0; i < 100; i++) {
+            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+            keyGen.init(128, SecureRandom.getInstanceStrong());
+            SecretKey key = keyGen.generateKey();
+            System.out.println(Base64.getEncoder().encodeToString(key.getEncoded()));
+        }
     }
 }

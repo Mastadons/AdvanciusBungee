@@ -43,7 +43,7 @@ public class SwearManager implements EventListener {
         ConfiguredChannel channel = (ConfiguredChannel) event.getMessage().getChannel();
         if (channel.getMetadata().hasMetadata("allowSwears", true)) return;
 
-        PermissionContext permissionContext = event.getMessage().getReader().getContextManager().getContext("permissions");
+        PermissionContext permissionContext = event.getMessage().getReader().getContextManager().getContext(PermissionContext.class);
         event.getMessage().setMessage(replaceSwears(event.getMessage().getMessage(), permissionContext.hasPermission("advancius.swearbypass")));
     }
 

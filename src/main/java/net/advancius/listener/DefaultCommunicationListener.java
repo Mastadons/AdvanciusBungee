@@ -1,13 +1,19 @@
 package net.advancius.listener;
 
+import com.google.gson.JsonObject;
 import net.advancius.AdvanciusBungee;
+import net.advancius.AdvanciusLang;
 import net.advancius.communication.CommunicationHandler;
 import net.advancius.communication.CommunicationListener;
+import net.advancius.communication.CommunicationManager;
 import net.advancius.communication.CommunicationPacket;
 import net.advancius.communication.client.Client;
+import net.advancius.communication.client.ClientCredentials;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
+import net.advancius.person.context.MetadataContext;
+import net.advancius.person.context.PermissionContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.protocol.Protocol;
 import net.advancius.statistic.Statistic;
@@ -26,13 +32,31 @@ public class DefaultCommunicationListener implements CommunicationListener {
 
     @CommunicationHandler(code = Protocol.CLIENT_CROSS_COMMAND)
     public void onCrossServerCommand(Client client, CommunicationPacket communicationPacket) {
-        ServerInfo server = ProxyServer.getInstance().getServerInfo(communicationPacket.getMetadata().getMetadata("server"));
+        String serverName = communicationPacket.getMetadata().getMetadata("server");
+        String command = communicationPacket.getMetadata().getMetadata("command");
+        String sender = communicationPacket.getMetadata().getMetadata("sender");
+
+        if (serverName.equalsIgnoreCase("Bungee")) {
+            ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
+            return;
+        }
+        ServerInfo server = ProxyServer.getInstance().getServerInfo(serverName);
 
         CommunicationPacket communicationResponse = CommunicationPacket.generatePacket(Protocol.SERVER_CROSS_COMMAND);
-        communicationResponse.getMetadata().setMetadata("command", communicationPacket.getMetadata().getMetadata("command"));
+        communicationResponse.getMetadata().setMetadata("command", command);
 
-        Client recipient = AdvanciusBungee.getInstance().getCommunicationManager().getClient(server);
+        Client recipient = AdvanciusBungee.getInstance().getCommunicationManager().getClientFromServer(server);
         recipient.sendPacket(communicationResponse);
+
+        PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().crossServer);
+        placeholderComponent.replace("client", client);
+        placeholderComponent.replace("sender", sender);
+        placeholderComponent.replace("recipient", recipient);
+        placeholderComponent.replace("command", command);
+        placeholderComponent.translateColor();
+
+        AdvanciusBungee.getInstance().getPersonManager().getOnlinePersons(person -> PermissionContext.hasPermission(person, "advancius.crosscommand"))
+                .forEach(placeholderComponent::send);
     }
 
     @CommunicationHandler(code = Protocol.CLIENT_DUMP_REQUEST)
@@ -70,8 +94,31 @@ public class DefaultCommunicationListener implements CommunicationListener {
         client.sendPacket(communicationResponse);
     }
 
-    @CommunicationHandler(code = Protocol.CLIENT_NAME)
+    @CommunicationHandler(code = Protocol.CLIENT_CREDENTIALS)
     public void onClientName(Client client, CommunicationPacket communicationPacket) {
-        client.setName(communicationPacket.getMetadata().getMetadata("name"));
+        CommunicationManager communicationManager = AdvanciusBungee.getInstance().getCommunicationManager();
+
+        String key = communicationPacket.getMetadata().getMetadata("key");
+        ClientCredentials credentials = communicationManager.getCredentials(key);
+        if (credentials == null) return;
+        client.setCredentials(credentials);
+    }
+
+    @CommunicationHandler(code = Protocol.CLIENT_REPLACE_PERSISTENT_METADATA)
+    public void onClientReplacePersistentMetadata(Client client, CommunicationPacket communicationPacket) {
+        UUID personId = UUID.fromString(communicationPacket.getMetadata().getMetadata("person"));
+        Person person = AdvanciusBungee.getInstance().getPersonManager().getPerson(personId);
+
+        JsonObject replacement = communicationPacket.getMetadata().getMetadata("replacement");
+        MetadataContext.getPersistentMetadata(person).deserialize(replacement);
+    }
+
+    @CommunicationHandler(code = Protocol.CLIENT_REPLACE_TRANSIENT_METADATA)
+    public void onClientReplaceTransientMetadata(Client client, CommunicationPacket communicationPacket) {
+        UUID personId = UUID.fromString(communicationPacket.getMetadata().getMetadata("person"));
+        Person person = AdvanciusBungee.getInstance().getPersonManager().getPerson(personId);
+
+        JsonObject replacement = communicationPacket.getMetadata().getMetadata("replacement");
+        MetadataContext.getTransientMetadata(person).deserialize(replacement);
     }
 }

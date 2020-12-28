@@ -113,4 +113,6 @@ public class AdvanciusLang {
     public String commandCooldown;
 
     public String cannotChatMuted;
+
+    public String crossServer;
 }

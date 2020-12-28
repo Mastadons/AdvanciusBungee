@@ -11,6 +11,7 @@ import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
 import net.advancius.person.context.MetadataContext;
+import net.advancius.utils.Metadata;
 
 import java.util.UUID;
 
@@ -30,11 +31,11 @@ public class DirectReplyCommand implements CommandListener {
     }
 
     private Person getReader(Person sender) throws Exception {
-        MetadataContext metadataContext = sender.getContextManager().getContext("metadata");
+        Metadata transientMetadata = MetadataContext.getTransientMetadata(sender);
 
-        CommandCommons.checkCondition(!metadataContext.getTransientMetadata().isMetadataOf("LastDirectSender", UUID.class),
+        CommandCommons.checkCondition(!transientMetadata.isMetadataOf("LastDirectSender", UUID.class),
                 AdvanciusLang.getInstance().noRecentSender);
 
-        return CommandCommons.getPerson(metadataContext.getTransientMetadata().getMetadata("LastDirectSender", UUID.class));
+        return CommandCommons.getPerson(transientMetadata.getMetadata("LastDirectSender", UUID.class));
     }
 }

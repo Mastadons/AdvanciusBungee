@@ -6,7 +6,7 @@ import net.advancius.AdvanciusLang;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.person.context.PermissionContext;
 import net.advancius.person.event.PersonJoinEvent;
@@ -14,7 +14,6 @@ import net.advancius.person.event.PersonMoveEvent;
 import net.advancius.person.event.PersonQuitEvent;
 import net.advancius.event.Event;
 import net.advancius.placeholder.PlaceholderComponent;
-import net.luckperms.api.cacheddata.CachedMetaData;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
@@ -67,9 +66,7 @@ public class DefaultBungeecordListener implements Listener {
         Person person = AdvanciusBungee.getInstance().getPersonManager().getPersonUnsafe(event.getSender());
         PermissionContext permissionContext0 = person.getContextManager().getContext(PermissionContext.class);
 
-        CachedMetaData metadata = permissionContext0.getLuckpermsUser().getCachedData().getMetaData();
-        String exemptStatus = metadata.getMetaValue("commandspy-exempt");
-        if (exemptStatus != null && exemptStatus.equalsIgnoreCase("true")) return;
+        if (permissionContext0.isCommandSpyExempt()) return;
 
         String commandName = event.getMessage().substring(1).split(" ")[0];
         for (String ignoredCommand : AdvanciusConfiguration.getInstance().commandSpyIgnore)
@@ -87,9 +84,7 @@ public class DefaultBungeecordListener implements Listener {
             placeholderComponent.replace("command", event.getMessage());
             placeholderComponent.replace("person", person);
             placeholderComponent.translateColor();
-
-            BungeecordContext bungeecordContext = onlinePerson.getContextManager().getContext("bungeecord");
-            bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+            placeholderComponent.send(onlinePerson);
         }
     }
 
@@ -101,9 +96,9 @@ public class DefaultBungeecordListener implements Listener {
         if (lastSpaceIndex >= 0) partial = partial.substring(lastSpaceIndex + 1);
 
         for (Person onlinePerson : AdvanciusBungee.getInstance().getPersonManager().getOnlinePersons()) {
-            BungeecordContext bungeecordContext = onlinePerson.getContextManager().getContext(BungeecordContext.class);
-            if (bungeecordContext.getProxiedPlayer().getName().toLowerCase().startsWith(partial)) {
-                event.getSuggestions().add(bungeecordContext.getProxiedPlayer().getName());
+            ConnectionContext connectionContext = onlinePerson.getContextManager().getContext(ConnectionContext.class);
+            if (connectionContext.getConnectionName().toLowerCase().startsWith(partial.toLowerCase())) {
+                event.getSuggestions().add(connectionContext.getConnectionName());
             }
         }
     }

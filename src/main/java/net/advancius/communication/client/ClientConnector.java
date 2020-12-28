@@ -3,6 +3,8 @@ package net.advancius.communication.client;
 import lombok.Data;
 import net.advancius.AdvanciusLogger;
 import net.advancius.communication.CommunicationManager;
+import net.advancius.communication.CommunicationPacket;
+import net.advancius.protocol.Protocol;
 
 import java.io.IOException;
 import java.net.Socket;

@@ -8,7 +8,6 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.placeholder.PlaceholderComponent;
 
@@ -30,8 +29,6 @@ public class SilentCommand implements CommandListener {
         placeholderComponent.replace("status", metadataContext.isSilent() ? "enabled" : "disabled");
         placeholderComponent.replace("person", person);
         placeholderComponent.translateColor();
-
-        BungeecordContext bungeecordContext = person.getContextManager().getContext(BungeecordContext.class);
-        bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+        placeholderComponent.send(person);
     }
 }

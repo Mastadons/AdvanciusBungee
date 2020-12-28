@@ -3,7 +3,6 @@ package net.advancius.channel.configured;
 import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusLang;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -28,8 +27,7 @@ public class ChannelCommand extends Command {
         PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().getChannelChange());
         component.replace("channel", channel);
         component.translateColor();
-
-        person.getContextManager().getContext(BungeecordContext.class).sendMessage(component.toTextComponentUnsafe());
+        component.send(person);
     }
 
     private static String[] getCommandAliases(ConfiguredChannel channel) {

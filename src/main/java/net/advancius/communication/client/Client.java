@@ -5,17 +5,22 @@ import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusLogger;
 import net.advancius.communication.CommunicationPacket;
 
+import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.logging.Level;
 
 @Data
 public class Client {
 
-    private String name;
+    private ClientCredentials credentials;
     private final Socket socket;
     private final ClientReader clientReader = new ClientReader(this);
     private final ClientConnection connection;
+
+    private SecretKey encryptionKey;
+    private byte[] salt;
 
     public Client(Socket socket) throws IOException {
         this.socket = socket;
@@ -24,7 +29,7 @@ public class Client {
 
     public boolean sendPacket(CommunicationPacket communicationPacket) {
         try {
-            connection.sendPacket(communicationPacket);
+            connection.sendPacket(this, communicationPacket);
             AdvanciusLogger.log(Level.INFO, "[Network] Successfully sent packet(%s) with code %d",
                     communicationPacket.getId().toString(), communicationPacket.getCode());
             return true;
@@ -42,5 +47,13 @@ public class Client {
         } catch (IOException exception) {
             exception.printStackTrace();
         }
+    }
+
+    public String getCompleteName() {
+        return credentials != null ? (credentials.isInternal() ? "<internal>" : "<external>") + " " + credentials.getName() : "unknown";
+    }
+
+    public String getSimpleName() {
+        return credentials != null ? credentials.getName() : "unknown";
     }
 }

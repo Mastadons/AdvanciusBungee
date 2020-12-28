@@ -2,7 +2,6 @@ package net.advancius.utils;
 
 import net.advancius.AdvanciusLang;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.placeholder.PlaceholderComponent;
 
 public class Commons {
@@ -15,7 +14,7 @@ public class Commons {
             PlaceholderComponent pc = new PlaceholderComponent(AdvanciusLang.getInstance().commandCooldown);
             pc.replace("cooldown", Math.round((next - System.currentTimeMillis()) / 1000.0));
             pc.translateColor();
-            BungeecordContext.sendMessage(person, pc.toTextComponentUnsafe());
+            pc.send(person);
         }
         return true;
     }

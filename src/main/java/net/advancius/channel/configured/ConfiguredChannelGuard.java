@@ -13,13 +13,11 @@ public class ConfiguredChannelGuard implements ChannelGuard {
 
     @Override
     public boolean canPersonRead(Person person) {
-        PermissionContext permissions = person.getContextManager().getContext("permissions");
-        return permissions.hasPermission(readPermission);
+        return PermissionContext.hasPermission(person, readPermission);
     }
 
     @Override
     public boolean canPersonSend(Person person) {
-        PermissionContext permissions = person.getContextManager().getContext("permissions");
-        return permissions.hasPermission(sendPermission);
+        return PermissionContext.hasPermission(person, sendPermission);
     }
 }

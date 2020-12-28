@@ -3,7 +3,6 @@ package net.advancius.command.defined;
 import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusConfiguration;
 import net.advancius.AdvanciusLang;
-import net.advancius.channel.ChannelConfiguration;
 import net.advancius.command.CommandConfiguration;
 import net.advancius.command.CommandDescription;
 import net.advancius.command.CommandHandler;
@@ -11,7 +10,7 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.PermissionContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.utils.ColorUtils;
@@ -32,11 +31,9 @@ public class AdvanciusCommand implements CommandListener {
             AdvanciusConfiguration.load();
             AdvanciusLang.load();
 
-            PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().reload);
-            placeholderComponent.translateColor();
-
-            BungeecordContext bungeecordContext = person.getContextManager().getContext("bungeecord");
-            bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+            PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().reload);
+            component.translateColor();
+            component.send(person);
         } catch (FileNotFoundException exception) {
             throw new Exception("Encountered error reloading", exception);
         }
@@ -44,25 +41,22 @@ public class AdvanciusCommand implements CommandListener {
 
     @CommandHandler(description = "advanciuschat.help")
     public void onHelpCommand(Person person, CommandDescription description, String[] arguments) throws Exception {
-        BungeecordContext.sendMessage(person, "&6&lAdvanciusChat Help Page");
+        ConnectionContext.sendMessage(person, "&6&lAdvanciusChat Help Page");
         for (CommandDescription commandDescription : CommandConfiguration.getInstance().getCommands()) {
             if (!PermissionContext.hasPermission(person, commandDescription.getPermission())) continue;
-            BungeecordContext.sendMessage(person, "&e" + commandDescription.getSyntax() + " &7» &f" + commandDescription.getDescription());
+            ConnectionContext.sendMessage(person, "&e" + commandDescription.getSyntax() + " &7» &f" + commandDescription.getDescription());
         }
     }
 
     @CommandHandler(description = "advanciuschat")
     public void onCommand(Person person, CommandDescription description, String[] arguments) throws Exception {
         if (arguments.length == 0) {
-            PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().info);
-            placeholderComponent.translateColor();
-
-            BungeecordContext bungeecordContext = person.getContextManager().getContext("bungeecord");
-            bungeecordContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+            PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().info);
+            component.translateColor();
+            component.send(person);
             return;
         }
 
-        BungeecordContext bungeecordContext = person.getContextManager().getContext("bungeecord");
-        bungeecordContext.sendMessage(ColorUtils.toTextComponent("&cUnknown subcommand."));
+        ConnectionContext.sendMessage(person, ColorUtils.toTextComponent("&cUnknown subcommand."));
     }
 }

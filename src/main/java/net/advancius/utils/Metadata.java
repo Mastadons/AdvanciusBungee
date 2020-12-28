@@ -5,7 +5,6 @@ import com.google.gson.JsonParser;
 import lombok.Getter;
 import net.advancius.AdvanciusBungee;
 import net.advancius.placeholder.WildcardPlaceholder;
-import org.yaml.snakeyaml.Yaml;
 
 import java.util.HashMap;
 import java.util.Map;

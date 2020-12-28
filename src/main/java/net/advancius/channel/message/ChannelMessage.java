@@ -9,7 +9,7 @@ import net.advancius.channel.message.event.MessageFormatEvent;
 import net.advancius.channel.message.event.MessagePostSendEvent;
 import net.advancius.channel.message.event.MessagePreSendEvent;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
+import net.advancius.person.context.ConnectionContext;
 import net.md_5.bungee.api.chat.TextComponent;
 
 @Data
@@ -33,12 +33,11 @@ public class ChannelMessage {
 
         MessageFormatEvent formatEvent = AdvanciusBungee.getInstance().getEventManager().generateEvent(MessageFormatEvent.class, this, channel.getDefaultFormatter());
         AdvanciusBungee.getInstance().getEventManager().executeEvent(formatEvent);
-
+        
         ChannelFormatter formatter = formatEvent.getFormatter();
         TextComponent formattedMessage = formatter.format(this);
 
-        BungeecordContext bungeecordContext = reader.getContextManager().getContext("bungeecord");
-        bungeecordContext.sendMessage(formattedMessage);
+        ConnectionContext.sendMessage(reader, formattedMessage);
 
         MessagePostSendEvent messagePostSendEvent = AdvanciusBungee.getInstance().getEventManager().generateEvent(MessagePostSendEvent.class, this, formattedMessage);
         AdvanciusBungee.getInstance().getEventManager().executeEvent(messagePostSendEvent);

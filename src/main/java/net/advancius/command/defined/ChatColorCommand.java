@@ -10,7 +10,6 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.utils.ColorUtils;
@@ -19,7 +18,7 @@ import net.md_5.bungee.api.ChatColor;
 @FlagManager.FlaggedClass
 public class ChatColorCommand implements CommandListener {
 
-    @FlagManager.FlaggedMethod(priority = 0, flag = DefinedFlag.POST_COMMANDS_LOAD)
+    @FlagManager.FlaggedMethod(flag = DefinedFlag.POST_COMMANDS_LOAD)
     public static void command() {
         ChatColorCommand command = new ChatColorCommand();
         AdvanciusBungee.getInstance().getCommandManager().registerListener(command);
@@ -34,10 +33,9 @@ public class ChatColorCommand implements CommandListener {
 
         person.getContextManager().getContext(MetadataContext.class).setChatColor(color);
 
-        PlaceholderComponent pc = new PlaceholderComponent(AdvanciusLang.getInstance().chatColorChanged);
-        pc.replace("color", ColorUtils.getFancyName(color));
-        pc.translateColor();
-
-        person.getContextManager().getContext(BungeecordContext.class).sendMessage(pc.toTextComponentUnsafe());
+        PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().chatColorChanged);
+        component.replace("color", ColorUtils.getFancyName(color));
+        component.translateColor();
+        component.send(person);
     }
 }

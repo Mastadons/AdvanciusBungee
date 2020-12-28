@@ -9,14 +9,9 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.person.context.PermissionContext;
 import net.advancius.placeholder.PlaceholderComponent;
-import net.advancius.utils.ColorUtils;
-import net.luckperms.api.cacheddata.CachedMetaData;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 @FlagManager.FlaggedClass
 public class IgnoreCommand implements CommandListener {
@@ -40,15 +35,10 @@ public class IgnoreCommand implements CommandListener {
 
         pc.replace("person", target);
         pc.translateColor();
-
-        person.getContextManager().getContext(BungeecordContext.class).sendMessage(pc.toTextComponentUnsafe());
+        pc.send(person);
     }
 
     private static boolean isExempt(Person person) {
-        PermissionContext permissionContext = person.getContextManager().getContext(PermissionContext.class);
-
-        CachedMetaData metadata = permissionContext.getLuckpermsUser().getCachedData().getMetaData();
-        String exemptStatus = metadata.getMetaValue("ignore-exempt");
-        return exemptStatus != null && exemptStatus.equalsIgnoreCase("true");
+        return person.getContextManager().getContext(PermissionContext.class).isIgnoreExempt();
     }
 }

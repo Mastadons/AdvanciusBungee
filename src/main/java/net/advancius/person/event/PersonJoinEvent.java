@@ -2,7 +2,7 @@ package net.advancius.person.event;
 
 import lombok.Getter;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
+import net.advancius.player.context.BungeecordContext;
 
 public class PersonJoinEvent extends PersonEvent {
 

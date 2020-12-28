@@ -10,21 +10,23 @@ import net.advancius.channel.message.event.MessagePostSendEvent;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
-import net.advancius.person.context.ChannelContext;
-import net.advancius.person.context.ContextManager;
-import net.advancius.person.context.PermissionContext;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.MetadataContext;
+import net.advancius.person.context.PermissionContext;
+import net.advancius.player.PlayerPerson;
+import net.advancius.person.context.ContextManager;
 import net.advancius.person.event.PersonJoinEvent;
 import net.advancius.person.event.PersonLoadEvent;
 import net.advancius.person.event.PersonMoveEvent;
 import net.advancius.person.event.PersonQuitEvent;
-import net.advancius.person.event.PersonSaveEvent;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.event.EventHandler;
 import net.advancius.event.EventListener;
+import net.advancius.player.context.PlayerChannelContext;
+import net.advancius.player.context.PlayerConnectionContext;
+import net.advancius.player.context.PlayerMetadataContext;
+import net.advancius.player.context.PlayerPermissionContext;
 import net.advancius.utils.Commons;
-import net.advancius.utils.Metadata;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -42,18 +44,20 @@ public class DefaultEventListener implements EventListener {
 
     @EventHandler(Integer.MIN_VALUE)
     public void onPersonLoad(PersonLoadEvent event) {
+        if (!(event.getPerson() instanceof PlayerPerson)) return;
+
         ContextManager contextManager = event.getPerson().getContextManager();
 
-        contextManager.addContext(BungeecordContext.class, 0);
-        contextManager.addContext(PermissionContext.class, 1);
-        contextManager.addContext(MetadataContext.class, 2);
-        contextManager.addContext(ChannelContext.class, 3);
+        contextManager.addContext(PlayerConnectionContext.class, 0);
+        contextManager.addContext(PlayerPermissionContext.class, 1);
+        contextManager.addContext(PlayerMetadataContext.class, 2);
+        contextManager.addContext(PlayerChannelContext.class, 3);
     }
 
     @EventHandler(Integer.MAX_VALUE)
     public void onPersonJoin(PersonJoinEvent event) {
-        MetadataContext metadata = event.getPerson().getContextManager().getContext("metadata");
-        BungeecordContext bungeecord = event.getPerson().getContextManager().getContext("bungeecord");
+        MetadataContext metadata = event.getPerson().getContextManager().getContext(MetadataContext.class);
+        ConnectionContext connection = event.getPerson().getContextManager().getContext(ConnectionContext.class);
 
         if (!metadata.isSilent()) {
             if (!metadata.getPersistentMetadata().hasMetadata("last_username")) {
@@ -61,58 +65,58 @@ public class DefaultEventListener implements EventListener {
                 component.replace("person", event.getPerson());
                 component.translateColor();
 
-                ProxyServer.getInstance().broadcast(component.toTextComponentUnsafe());
+                ProxyServer.getInstance().broadcast(component.toTextComponent());
             }
             PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().getJoin());
             component.replace("person", event.getPerson());
             component.translateColor();
 
-            ProxyServer.getInstance().broadcast(component.toTextComponentUnsafe());
+            ProxyServer.getInstance().broadcast(component.toTextComponent());
         }
-        metadata.getPersistentMetadata().setMetadata("last_username", bungeecord.getProxiedPlayer().getName());
+        metadata.getPersistentMetadata().setMetadata("last_username", connection.getConnectionName());
     }
 
     @EventHandler(Integer.MAX_VALUE)
     public void onPersonQuit(PersonQuitEvent event) {
-        MetadataContext metadata = event.getPerson().getContextManager().getContext("metadata");
+        MetadataContext metadata = event.getPerson().getContextManager().getContext(MetadataContext.class);
         if (!metadata.isSilent()) {
             PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().getQuit());
             component.replace("person", event.getPerson());
             component.translateColor();
 
-            ProxyServer.getInstance().broadcast(component.toTextComponentUnsafe());
+            ProxyServer.getInstance().broadcast(component.toTextComponent());
         }
     }
 
     @EventHandler(Integer.MAX_VALUE)
     public void onPersonMove(PersonMoveEvent event) {
-        MetadataContext metadata = event.getPerson().getContextManager().getContext("metadata");
-        BungeecordContext bungeecordContext = event.getPerson().getContextManager().getContext("bungeecord");
+        MetadataContext metadata = event.getPerson().getContextManager().getContext(MetadataContext.class);
+        ConnectionContext connection = event.getPerson().getContextManager().getContext(ConnectionContext.class);
 
-        if (!metadata.isSilent() && !AdvanciusConfiguration.getInstance().silentMoveServers.contains(bungeecordContext.getServer().getName()) && metadata.getTransientMetadata().hasMetadata("ending_server")) {
+        if (!metadata.isSilent() && !AdvanciusConfiguration.getInstance().silentMoveServers.contains(connection.getServer().getName()) && metadata.getTransientMetadata().hasMetadata("ending_server")) {
             PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().getMove());
             component.replace("person", event.getPerson());
-            component.replace("server", bungeecordContext.getProxiedPlayer().getServer().getInfo());
+            component.replace("server", connection.getServer());
             component.translateColor();
 
-            TextComponent textComponent = component.toTextComponentUnsafe();
-            textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + bungeecordContext.getServer().getName()));
+            TextComponent textComponent = component.toTextComponent();
+            textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + connection.getServer().getName()));
             textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("Click to follow to server")));
             ProxyServer.getInstance().broadcast(textComponent);
         }
 
-        metadata.getTransientMetadata().setMetadata("ending_server", bungeecordContext.getServer().getName());
+        metadata.getTransientMetadata().setMetadata("ending_server", connection.getServer().getName());
     }
 
     @EventHandler(Integer.MAX_VALUE)
     public void onMessagePostSend(MessagePostSendEvent event) {
         if (event.getMessage().getSender().equals(event.getMessage().getReader())) return;
-        BungeecordContext bungeecordContext = event.getMessage().getReader().getContextManager().getContext(BungeecordContext.class);
+        ConnectionContext connection = event.getMessage().getReader().getContextManager().getContext(ConnectionContext.class);
 
         String message = event.getMessage().getMessage().toLowerCase();
-        if (!message.contains(bungeecordContext.getProxiedPlayer().getDisplayName().toLowerCase())) return;
+        if (!message.contains(connection.getConnectionName().toLowerCase())) return;
 
-        bungeecordContext.sendTitle("&6", AdvanciusLang.getInstance().mentioned, 0, 30, 0);
+        connection.sendTitle("&6", AdvanciusLang.getInstance().mentioned, 0, 30, 0);
     }
 
     @EventHandler(Integer.MIN_VALUE)
@@ -147,15 +151,13 @@ public class DefaultEventListener implements EventListener {
         String[] components = event.getMessage().split(" ");
 
         Person targetPerson = AdvanciusBungee.getInstance().getPersonManager().getOnlinePerson(components[0]);
-        String message = components.length == 1 ? "" : String.join(" ", Arrays.copyOfRange(components, 1, components.length));
 
         if (targetPerson == null) {
-            BungeecordContext.sendMessage(event.getSender(), AdvanciusLang.getInstance().unknownPlayer);
+            ConnectionContext.sendMessage(event.getSender(), AdvanciusLang.getInstance().unknownPlayer);
             event.setCancelled(true);
             return;
         }
-
         event.setReaders(Arrays.asList(event.getSender(), targetPerson));
-        event.setMessage(message);
+        event.setMessage(event.getSender().getId() + " " + targetPerson.getId() + " " + Arrays.copyOfRange(components, 1, components.length));
     }
 }

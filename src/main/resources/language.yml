@@ -69,3 +69,4 @@ eightBallResponses:
 eightBallIncorrectChannel: "You must be in the global channel to use magic eight ball"
 commandCooldown: "&cThis command is currently on cooldown. Try again in {cooldown} seconds."
 cannotChatMuted: "&cYou cannot chat because you are muted."
+crossServer: "&3[{client.getSimpleName}] {sender} &7-> &3{recipient.getSimpleName} &8» &f{command}"

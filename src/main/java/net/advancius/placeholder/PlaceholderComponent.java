@@ -2,6 +2,8 @@ package net.advancius.placeholder;
 
 import lombok.Data;
 import net.advancius.AdvanciusBungee;
+import net.advancius.person.Person;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.utils.ColorUtils;
 import net.advancius.utils.Reflection;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -145,12 +147,11 @@ public class PlaceholderComponent {
         text = ColorUtils.translateColor(text);
     }
 
-    @Deprecated
-    public TextComponent toTextComponentUnsafe() {
+    public TextComponent toTextComponent() {
         return new TextComponent(TextComponent.fromLegacyText(text));
     }
 
-    public BaseComponent[] toTextComponent() {
-        return TextComponent.fromLegacyText(text);
+    public void send(Person person) {
+        ConnectionContext.sendMessage(person, toTextComponent());
     }
 }

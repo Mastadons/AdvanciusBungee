@@ -1,37 +1,25 @@
-package net.advancius.person.context;
+package net.advancius.player.context;
 
 import com.google.gson.JsonObject;
 import lombok.Data;
-import net.advancius.person.Person;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.utils.ColorUtils;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.Title;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-
 @Data
-public class BungeecordContext extends PersonContext {
-
-    public static void sendMessage(Person person, TextComponent component) {
-        person.getContextManager().getContext(BungeecordContext.class).sendMessage(component);
-    }
-
-    public static void sendMessage(Person person, String message) {
-        person.getContextManager().getContext(BungeecordContext.class).sendMessage(message);
-    }
+public class PlayerConnectionContext extends ConnectionContext {
 
     private ProxiedPlayer proxiedPlayer;
 
+    @Override
     public void sendMessage(TextComponent component) {
         proxiedPlayer.sendMessage(component);
     }
 
-    public void sendMessage(String message) {
-        sendMessage(ColorUtils.toTextComponent(message));
-    }
-
+    @Override
     public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         ProxyServer.getInstance().createTitle()
             .title(ColorUtils.toTextComponent(title))
@@ -42,6 +30,7 @@ public class BungeecordContext extends PersonContext {
             .send(proxiedPlayer);
     }
 
+    @Override
     public ServerInfo getServer() {
         return proxiedPlayer.getServer().getInfo();
     }
@@ -57,10 +46,10 @@ public class BungeecordContext extends PersonContext {
     }
 
     @Override
-    public void onPersonSave() {}
+    public String getConnectionName() {
+        return proxiedPlayer.getName();
+    }
 
     @Override
-    public String getName() {
-        return "bungeecord";
-    }
+    public void onPersonSave() {}
 }

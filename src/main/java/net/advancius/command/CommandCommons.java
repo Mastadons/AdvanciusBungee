@@ -4,7 +4,6 @@ import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusLang;
 import net.advancius.channel.configured.ConfiguredChannel;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.utils.ColorUtils;
 import net.md_5.bungee.api.ChatColor;

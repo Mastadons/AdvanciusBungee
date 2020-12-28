@@ -8,7 +8,6 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.placeholder.PlaceholderComponent;
 
@@ -23,14 +22,13 @@ public class CommandSpyCommand implements CommandListener {
 
     @CommandHandler(description = "commandspy")
     public void onCommand(Person person, CommandDescription description, String argument) throws Exception {
-        MetadataContext mc = person.getContextManager().getContext(MetadataContext.class);
-        mc.setCommandSpy(!mc.isCommandSpy());
+        MetadataContext metadata = person.getContextManager().getContext(MetadataContext.class);
+        metadata.setCommandSpy(!metadata.isCommandSpy());
 
-        PlaceholderComponent pc = new PlaceholderComponent(AdvanciusLang.getInstance().commandSpyToggle);
-        pc.replace("status", mc.isCommandSpy() ? "enabled" : "disabled");
-        pc.replace("person", person);
-        pc.translateColor();
-
-        BungeecordContext.sendMessage(person, pc.toTextComponentUnsafe());
+        PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().commandSpyToggle);
+        component.replace("status", metadata.isCommandSpy() ? "enabled" : "disabled");
+        component.replace("person", person);
+        component.translateColor();
+        component.send(person);
     }
 }

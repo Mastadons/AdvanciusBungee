@@ -1,10 +1,10 @@
-package net.advancius.person;
+package net.advancius.player;
 
-import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import net.advancius.person.Person;
 import net.advancius.person.context.ContextManager;
 import net.advancius.person.context.PersonContext;
 import net.advancius.placeholder.WildcardPlaceholder;
@@ -13,8 +13,8 @@ import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class DefinedPerson implements Person {
+@RequiredArgsConstructor
+public class PlayerPerson implements Person {
 
     @EqualsAndHashCode.Include
     private final UUID id;
@@ -24,6 +24,6 @@ public class DefinedPerson implements Person {
 
     @WildcardPlaceholder
     private PersonContext wildcardPlaceholder(String argument) {
-        return contextManager.getContext(argument);
+        return contextManager.getNamedContext(argument);
     }
 }

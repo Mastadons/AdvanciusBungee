@@ -47,6 +47,11 @@ public class InternalCommand extends Command {
 
         Object argument = getArgument(arguments);
 
+        if (person == null || (person != null && !handlerMethod.getMethod().getParameterTypes()[0].isAssignableFrom(person.getClass()))) {
+            commandSender.sendMessage(ColorUtils.toTextComponent("&cThis interface is not supported by this command."));
+            return;
+        }
+
         try {
             handlerMethod.getMethod().invoke(listener, person, description, argument);
         } catch (Throwable exception) {

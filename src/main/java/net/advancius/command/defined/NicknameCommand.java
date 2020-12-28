@@ -10,7 +10,7 @@ import net.advancius.command.CommandListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
-import net.advancius.person.context.BungeecordContext;
+import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.utils.ColorUtils;
@@ -26,12 +26,11 @@ public class NicknameCommand implements CommandListener {
 
     @CommandHandler(description = "nickname")
     public void onCommand(Person person, CommandDescription description, String argument) throws Exception {
-        BungeecordContext bc = person.getContextManager().getContext("bungeecord");
-        MetadataContext mc = person.getContextManager().getContext(MetadataContext.class);
+        MetadataContext metadata = person.getContextManager().getContext(MetadataContext.class);
 
         if (argument == null || argument.isEmpty()) {
-            mc.setNickname(null);
-            bc.sendMessage(ColorUtils.toTextComponent(AdvanciusLang.getInstance().nicknameReset));
+            metadata.setNickname(null);
+            ConnectionContext.sendMessage(person, ColorUtils.toTextComponent(AdvanciusLang.getInstance().nicknameReset));
             return;
         }
 
@@ -41,12 +40,11 @@ public class NicknameCommand implements CommandListener {
         CommandCommons.checkCondition(argument.length() > AdvanciusConfiguration.getInstance().maxNicknameLength,
                 AdvanciusLang.getInstance().nicknameMax);
 
-        mc.setNickname(argument);
+        metadata.setNickname(argument);
 
-        PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().nicknameChanged);
-        placeholderComponent.replace("nickname", argument);
-        placeholderComponent.translateColor();
-
-        bc.sendMessage(placeholderComponent.toTextComponentUnsafe());
+        PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().nicknameChanged);
+        component.replace("nickname", argument);
+        component.translateColor();
+        component.send(person);
     }
 }
