@@ -42,12 +42,4 @@ public class EncryptionListener implements CommunicationListener {
         CommunicationPacket encryptionAccept = CommunicationPacket.generatePacket(Protocol.SERVER_ACCEPT_ENCRYPTION);
         client.sendPacket(encryptionAccept);
     }
-
-    private byte[] convertByteList(ArrayList<Number> byteList) {
-        byte[] array = new byte[byteList.size()];
-        for (int i = 0; i < byteList.size(); i++) {
-            array[i] = byteList.get(i).byteValue();
-        }
-        return array;
-    }
 }

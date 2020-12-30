@@ -34,7 +34,7 @@ public class CommunicationManager {
         CommunicationManager instance = new CommunicationManager();
         instance.encryptionKeypair = AsymmetricEncryption.AsymmetricEncryptionKeypair.generateKeypair();
         instance.startCommunication();
-        
+
         AdvanciusBungee.getInstance().setCommunicationManager(instance);
     }
 
@@ -47,7 +47,8 @@ public class CommunicationManager {
 
     private AsymmetricEncryption.AsymmetricEncryptionKeypair encryptionKeypair;
 
-    private final Map<UUID, AtomicReference<CommunicationPacket>> requestMap = new HashMap<>();
+    private final RequestManager requestManager = new RequestManager();
+
     private final List<CommunicationListener> listenerList = new ArrayList<>();
 
     private final List<UUID> usedIds = Collections.synchronizedList(new ArrayList<>());
@@ -80,7 +81,7 @@ public class CommunicationManager {
 
     public void handleReadPacket(Client client, CommunicationPacket communicationPacket) {
         if (packetExists(communicationPacket)) return;
-        if (handleRequest(communicationPacket)) return;
+        if (requestManager.handleRequest(communicationPacket)) return;
 
         AdvanciusLogger.log(Level.INFO, "[Network] (%s) Incoming packet(%s) with code %d",
                 client.getCompleteName(), communicationPacket.getId().toString(), communicationPacket.getCode());
@@ -97,7 +98,8 @@ public class CommunicationManager {
     public Client getClientFromServer(ServerInfo serverInfo) {
         for (Client client : clientList) {
             if (client.getCredentials() == null) continue;
-            if (client.getCredentials().isInternal() && client.getCredentials().getName().equalsIgnoreCase(serverInfo.getName())) return client;
+            if (client.getCredentials().isInternal() && client.getCredentials().getName().equalsIgnoreCase(serverInfo.getName()))
+                return client;
         }
         return null;
     }
@@ -116,20 +118,8 @@ public class CommunicationManager {
         }
         return null;
     }
-    private boolean handleRequest(CommunicationPacket communicationPacket) {
-        if (communicationPacket.getRespondingTo() == null) return false;
-        requestMap.forEach((requestId, reference) -> {
-            if (!communicationPacket.getRespondingTo().equals(requestId)) return;
-            AdvanciusLogger.log(Level.INFO, "[Network] Handling incoming response(%s) with code %d",
-                    communicationPacket.getId().toString(), communicationPacket.getCode());
-            reference.set(communicationPacket);
-        });
-        return requestMap.remove(communicationPacket.getRespondingTo()) != null;
-    }
 
-    public void awaitResponse(CommunicationPacket communicationPacket, AtomicReference<CommunicationPacket> reference) {
-        requestMap.put(communicationPacket.getId(), reference);
-    }
+
 
     public void registerListener(CommunicationListener listener) {
         listenerList.add(listener);
@@ -143,5 +133,7 @@ public class CommunicationManager {
         clientList.add(client);
     }
 
-    public void unregisterClient(Client client) { clientList.remove(client); }
+    public void unregisterClient(Client client) {
+        clientList.remove(client);
+    }
 }

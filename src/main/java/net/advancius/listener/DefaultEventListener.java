@@ -141,23 +141,4 @@ public class DefaultEventListener implements EventListener {
             event.setCancelled(true);
         else MetadataContext.getTransientMetadata(event.getSender()).setMetadata(channel.getName() + "-lastsent", System.currentTimeMillis());
     }
-
-    @EventHandler(Integer.MIN_VALUE)
-    public void onArgumentReader(MessageGenerateEvent event) {
-        if (!(event.getChannel() instanceof ConfiguredChannel)) return;
-        ConfiguredChannel channel = (ConfiguredChannel) event.getChannel();
-
-        if (!channel.getMetadata().hasMetadata("argumentReader", true)) return;
-        String[] components = event.getMessage().split(" ");
-
-        Person targetPerson = AdvanciusBungee.getInstance().getPersonManager().getOnlinePerson(components[0]);
-
-        if (targetPerson == null) {
-            ConnectionContext.sendMessage(event.getSender(), AdvanciusLang.getInstance().unknownPlayer);
-            event.setCancelled(true);
-            return;
-        }
-        event.setReaders(Arrays.asList(event.getSender(), targetPerson));
-        event.setMessage(event.getSender().getId() + " " + targetPerson.getId() + " " + Arrays.copyOfRange(components, 1, components.length));
-    }
 }

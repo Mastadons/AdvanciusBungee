@@ -34,14 +34,12 @@ public class ClientReader extends Thread {
 
                 if (client.getEncryptionKey() == null && communicationPacket.getCode() != Protocol.CLIENT_ENCRYPTION) {
                     AdvanciusLogger.warn("Client attempted to send unencrypted data, disconnecting.");
-                    client.disconnect();
-                    break;
+                    continue;
                 }
 
                 if (client.getEncryptionKey() != null && client.getCredentials() == null && communicationPacket.getCode() != Protocol.CLIENT_CREDENTIALS) {
                     AdvanciusLogger.warn("Unauthenticated client attempted to send data, disconnecting.");
-                    client.disconnect();
-                    break;
+                    continue;
                 }
 
                 AdvanciusBungee.getInstance().getCommunicationManager().handleReadPacket(client, communicationPacket);

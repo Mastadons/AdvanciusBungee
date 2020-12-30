@@ -28,12 +28,16 @@ public class SwearManager implements EventListener {
     public static void swearManager() throws FileNotFoundException {
         SwearManager instance = new SwearManager();
 
+        loadSwearsFile(instance);
+        AdvanciusBungee.getInstance().getEventManager().registerListener(instance);
+        AdvanciusBungee.getInstance().setSwearManager(instance);
+    }
+
+    private static void loadSwearsFile(SwearManager instance) throws FileNotFoundException {
+        instance.swearList.clear();
         File swearsFile = FileManager.getServerFile("swears.txt", "swears.txt");
         Scanner scanner = new Scanner(new FileReader(swearsFile));
         while (scanner.hasNextLine()) instance.swearList.add(scanner.nextLine());
-
-        AdvanciusBungee.getInstance().getEventManager().registerListener(instance);
-        AdvanciusBungee.getInstance().setSwearManager(instance);
     }
 
     @EventHandler(Integer.MIN_VALUE)

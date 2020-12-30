@@ -31,6 +31,17 @@ public class InternalCommand extends Command {
             person = AdvanciusBungee.getInstance().getPersonManager().getPerson(((ProxiedPlayer) commandSender).getUniqueId());
         }
 
+        if (invokeSubcommand(commandSender, arguments)) return;
+
+        if (isUnhandledInterface(person)) {
+            commandSender.sendMessage(ColorUtils.toTextComponent("&cThis interface is not supported by this command."));
+            return;
+        }
+
+        handlerMethod.invokeCommand(listener, person, description, getArgument(arguments));
+    }
+
+    private boolean invokeSubcommand(CommandSender commandSender, String[] arguments) {
         InternalCommand subcommand = null;
         String subcommandName = description.getName();
         int argumentIndex = 0;
@@ -42,24 +53,12 @@ public class InternalCommand extends Command {
         }
         if (subcommand != null) {
             subcommand.execute(commandSender, Arrays.copyOfRange(arguments, argumentIndex, arguments.length));
-            return;
         }
+        return subcommand != null;
+    }
 
-        Object argument = getArgument(arguments);
-
-        if (person == null || (person != null && !handlerMethod.getMethod().getParameterTypes()[0].isAssignableFrom(person.getClass()))) {
-            commandSender.sendMessage(ColorUtils.toTextComponent("&cThis interface is not supported by this command."));
-            return;
-        }
-
-        try {
-            handlerMethod.getMethod().invoke(listener, person, description, argument);
-        } catch (Throwable exception) {
-            if (exception instanceof InvocationTargetException) exception = exception.getCause();
-
-            commandSender.sendMessage(ColorUtils.toTextComponent("&cEncountered " + exception.getClass().getSimpleName() + ". " + exception.getMessage()));
-            if (CommandConfiguration.getInstance().isDebugExceptions()) exception.printStackTrace();
-        }
+    private boolean isUnhandledInterface(Person person) {
+        return person == null || (person != null && !handlerMethod.getMethod().getParameterTypes()[0].isAssignableFrom(person.getClass()));
     }
 
     private Object getArgument(String[] arguments) {

@@ -1,9 +1,7 @@
 package net.advancius.communication;
 
-import lombok.Data;
 import lombok.Getter;
 import net.advancius.AdvanciusLogger;
-import net.advancius.channel.configured.ConfiguredChannel;
 import net.advancius.communication.client.ClientCredentials;
 import net.advancius.file.FileManager;
 import net.advancius.flag.DefinedFlag;
@@ -15,7 +13,6 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.List;
 import java.util.Map;
 
 @FlagManager.FlaggedClass

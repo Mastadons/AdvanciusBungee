@@ -4,6 +4,7 @@ import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusLang;
 import net.advancius.person.Person;
 import net.advancius.placeholder.PlaceholderComponent;
+import net.advancius.placeholder.PlaceholderComponentBuilder;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -24,10 +25,8 @@ public class ChannelCommand extends Command {
     public void execute(CommandSender sender, String[] args) {
         Person person = AdvanciusBungee.getInstance().getPersonManager().getPerson(((ProxiedPlayer) sender).getUniqueId());
 
-        PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().getChannelChange());
-        component.replace("channel", channel);
-        component.translateColor();
-        component.send(person);
+        PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().channelChange)
+                .replace("channel", channel).sendColored(person);
     }
 
     private static String[] getCommandAliases(ConfiguredChannel channel) {

@@ -1,4 +1,4 @@
-package net.advancius.statistic.adapter;
+package net.advancius.statistic.classadapter;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;

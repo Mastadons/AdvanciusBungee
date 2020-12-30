@@ -1,4 +1,4 @@
-package net.advancius.command.defined.emote;
+package net.advancius.command.defined;
 
 import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusConfiguration;

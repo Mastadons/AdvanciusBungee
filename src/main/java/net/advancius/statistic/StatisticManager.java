@@ -7,7 +7,7 @@ import net.advancius.AdvanciusLogger;
 import net.advancius.file.FileManager;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
-import net.advancius.statistic.adapter.ClassTypeAdapterFactory;
+import net.advancius.statistic.classadapter.ClassTypeAdapterFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
