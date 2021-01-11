@@ -6,8 +6,10 @@ import net.advancius.channel.message.ChannelMessage;
 
 public class MessageFormatEvent extends ChannelMessageEvent {
 
-    @Getter private ChannelFormatter formatter;
-    @Getter private final boolean cancellable = false;
+    @Getter
+    private ChannelFormatter formatter;
+    @Getter
+    private final boolean cancellable = false;
 
     public MessageFormatEvent(ChannelMessage message, ChannelFormatter formatter) {
         super(message);
@@ -15,8 +17,10 @@ public class MessageFormatEvent extends ChannelMessageEvent {
     }
 
     @Override
-    public void eventCompleted() {}
+    public void eventCompleted() {
+    }
 
     @Override
-    public void eventCancelled() {}
+    public void eventCancelled() {
+    }
 }

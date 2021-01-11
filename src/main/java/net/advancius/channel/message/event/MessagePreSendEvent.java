@@ -5,15 +5,18 @@ import net.advancius.channel.message.ChannelMessage;
 
 public class MessagePreSendEvent extends ChannelMessageEvent {
 
-    @Getter private final boolean cancellable = true;
+    @Getter
+    private final boolean cancellable = true;
 
     public MessagePreSendEvent(ChannelMessage message) {
         super(message);
     }
 
     @Override
-    public void eventCompleted() {}
+    public void eventCompleted() {
+    }
 
     @Override
-    public void eventCancelled() {}
+    public void eventCancelled() {
+    }
 }

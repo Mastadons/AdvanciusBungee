@@ -6,7 +6,6 @@ import net.advancius.person.Person;
 import net.advancius.person.context.ConnectionContext;
 import net.advancius.utils.ColorUtils;
 import net.advancius.utils.Reflection;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 import java.awt.Point;
@@ -27,7 +26,9 @@ public class PlaceholderComponent {
 
     private boolean replaceJson = false;
 
-    public PlaceholderComponent(String text) { this.text = text; }
+    public PlaceholderComponent(String text) {
+        this.text = text;
+    }
 
     public void replace(String original, Object replacement) {
         if (original.length() == 0 || replacement == null) return;
@@ -35,7 +36,7 @@ public class PlaceholderComponent {
         List<Point> placeholderSubstrings = getPlaceholderSubstrings();
         List<String> replacementTextList = new ArrayList<>();
         for (Point substring : placeholderSubstrings) {
-            String substringText = text.substring(substring.x+1, substring.y);
+            String substringText = text.substring(substring.x + 1, substring.y);
 
             String[] substringComponents = substringText.split("\\.");
 
@@ -50,7 +51,7 @@ public class PlaceholderComponent {
             }
             Object internalReplacement = replacement;
 
-            for (int i=1; i<substringComponents.length; ++i) {
+            for (int i = 1; i < substringComponents.length; ++i) {
                 Method wildcardMethod = getWildcardMethod(internalReplacement);
                 Method method = getPlaceholderMethod(internalReplacement, substringComponents[i]);
                 Field field = getPlaceholderField(internalReplacement, substringComponents[i]);
@@ -71,13 +72,13 @@ public class PlaceholderComponent {
         String result = text + " ";
         int increase = 0;
 
-        for (int i=0; i<placeholderSubstrings.size(); i++) {
+        for (int i = 0; i < placeholderSubstrings.size(); i++) {
             Point substringRange = placeholderSubstrings.get(i);
 
-            result = result.substring(0, substringRange.x + increase) + replacementTextList.get(i) + result.substring(substringRange.y+1 + increase);
+            result = result.substring(0, substringRange.x + increase) + replacementTextList.get(i) + result.substring(substringRange.y + 1 + increase);
             increase += replacementTextList.get(i).length() - (substringRange.y - substringRange.x + 1);
         }
-        text = result.substring(0, result.length()-1);
+        text = result.substring(0, result.length() - 1);
     }
 
     private String getReplacement(Object internalReplacement) {
@@ -88,13 +89,9 @@ public class PlaceholderComponent {
 
     private Field getPlaceholderField(Object object, String placeholder) {
         for (Field field : object.getClass().getDeclaredFields()) {
-            /*if (!field.isAnnotationPresent(Placeholder.class)) continue;
-            String methodPlaceholder = field.getAnnotation(Placeholder.class).value();
-
-            if (!placeholder.equals(methodPlaceholder)) continue;
-            return field;
-
-             */
+            if (field.getName().equals(placeholder)) return field;
+        }
+        for (Field field : object.getClass().getFields()) {
             if (field.getName().equals(placeholder)) return field;
         }
         return null;
@@ -102,14 +99,9 @@ public class PlaceholderComponent {
 
     private Method getPlaceholderMethod(Object object, String placeholder) {
         for (Method method : object.getClass().getDeclaredMethods()) {
-            /*
-            if (!method.isAnnotationPresent(Placeholder.class)) continue;
-            String methodPlaceholder = method.getAnnotation(Placeholder.class).value();
-
-            if (!placeholder.equals(methodPlaceholder)) continue;
-            return method;
-
-             */
+            if (method.getName().equals(placeholder)) return method;
+        }
+        for (Method method : object.getClass().getMethods()) {
             if (method.getName().equals(placeholder)) return method;
         }
         return null;
@@ -128,7 +120,7 @@ public class PlaceholderComponent {
         boolean inside = false;
 
         char[] characters = text.toCharArray();
-        for (int i=0; i<characters.length; ++i) {
+        for (int i = 0; i < characters.length; ++i) {
             if (characters[i] == OPENING_CHARACTER) {
                 if (inside) continue;
                 opening = i;
@@ -137,7 +129,7 @@ public class PlaceholderComponent {
             if (characters[i] == CLOSING_CHARACTER && inside) {
                 if (!inside) continue;
                 inside = false;
-                if (i-opening > 1) substrings.add(new Point(opening, i));
+                if (i - opening > 1) substrings.add(new Point(opening, i));
             }
         }
         return substrings;

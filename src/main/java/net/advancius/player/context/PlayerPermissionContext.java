@@ -73,5 +73,6 @@ public class PlayerPermissionContext extends PermissionContext {
     }
 
     @Override
-    public void onPersonSave() {}
+    public void onPersonSave() {
+    }
 }

@@ -44,8 +44,10 @@ public class DirectMessenger {
             MetadataContext metadataContext = onlinePerson.getContextManager().getContext(MetadataContext.class);
 
             if (isSocialSpyExempt(directMessage.getSender()) || isSocialSpyExempt(directMessage.getReader())) continue;
-            if (onlinePerson.equals(directMessage.getSender()) || onlinePerson.equals(directMessage.getReader())) continue;
-            if (!permissionContext.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("socialspy").getPermission())) continue;
+            if (onlinePerson.equals(directMessage.getSender()) || onlinePerson.equals(directMessage.getReader()))
+                continue;
+            if (!permissionContext.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("socialspy").getPermission()))
+                continue;
             if (!metadataContext.isSocialSpy()) continue;
 
             PlaceholderComponent pc = new PlaceholderComponent(AdvanciusLang.getInstance().socialSpy);

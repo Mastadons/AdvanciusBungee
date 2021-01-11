@@ -7,73 +7,32 @@ import net.advancius.AdvanciusLogger;
 import net.advancius.channel.configured.ConfiguredChannel;
 import net.advancius.channel.message.ChannelMessage;
 import net.advancius.channel.message.event.MessageGenerateEvent;
-import net.advancius.communication.CommunicationHandler;
-import net.advancius.communication.CommunicationListener;
-import net.advancius.communication.CommunicationPacket;
-import net.advancius.communication.client.Client;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
+import net.advancius.person.context.ChannelContext;
 import net.advancius.person.context.ConnectionContext;
-import net.advancius.person.context.MetadataContext;
 import net.advancius.person.context.PermissionContext;
-import net.advancius.protocol.Protocol;
 import net.advancius.utils.ColorUtils;
-import net.advancius.utils.Metadata;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
-import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.event.EventHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @FlagManager.FlaggedClass
-public class ChannelManager implements Listener, CommunicationListener {
+public class ChannelManager implements Listener {
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = 15)
     private static void channelManager() {
         ChannelManager instance = new ChannelManager();
         AdvanciusBungee.getInstance().setChannelManager(instance);
 
-        ProxyServer.getInstance().getPluginManager().registerListener(AdvanciusBungee.getInstance(), instance);
-        AdvanciusBungee.getInstance().getCommunicationManager().registerListener(instance);
-
         FlagManager.runFlaggedMethods("net.advancius", DefinedFlag.POST_CHANNELS_LOAD);
     }
 
-    @EventHandler(priority = 100)
-    public void onPersonChat(ChatEvent event) {
-        if (event.isCommand() || !(event.getSender() instanceof ProxiedPlayer)) return;
-
-        if (!(event.getReceiver() instanceof Server)) return;
-        Server server = (Server) event.getReceiver();
-        Person person = AdvanciusBungee.getInstance().getPersonManager().getPerson(((ProxiedPlayer) event.getSender()).getUniqueId());
-        String message = event.getMessage();
-
-        if (isServerProcessing(server.getInfo())) return;
-        event.setCancelled(true);
-
-        handleNaturalChat(person, message);
-    }
-
-    @CommunicationHandler(code = Protocol.CLIENT_CHAT)
-    public void onServerChat(Client client, CommunicationPacket communicationPacket) {
-        UUID personId = UUID.fromString(communicationPacket.getMetadata().getMetadata("person"));
-
-        Person person = AdvanciusBungee.getInstance().getPersonManager().getPerson(personId);
-        String message = communicationPacket.getMetadata().getMetadata("message");
-
-        handleNaturalChat(person, message);
-    }
-
-    private void handleNaturalChat(Person person, String message) {
+    public void handleNaturalChat(Person person, String message) {
         ConnectionContext connection = person.getContextManager().getContext(ConnectionContext.class);
-        PermissionContext permission = person.getContextManager().getContext(PermissionContext.class);
 
         ConfiguredChannel shortcutChannel = getShortcutChannel(person, message);
         ConfiguredChannel channel = getChannel(person);
@@ -81,10 +40,7 @@ public class ChannelManager implements Listener, CommunicationListener {
             channel = shortcutChannel;
             message = message.substring(1);
         }
-        if (channel.getMetadata().hasMetadata("locked", true) && !permission.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("chatlock").getPermission())) {
-            connection.sendMessage(ColorUtils.toTextComponent(AdvanciusLang.getInstance().cannotChatLocked));
-            return;
-        }
+        if (checkChannelLocked(person, channel)) return;
 
         List<ChannelMessage> messageList = generateMessage(person, channel, message, AdvanciusBungee.getInstance().getPersonManager().getOnlinePersons());
 
@@ -116,18 +72,16 @@ public class ChannelManager implements Listener, CommunicationListener {
         return null;
     }
 
-    public ConfiguredChannel getChannel(Person person) {
-        Metadata persistentMetadata = MetadataContext.getPersistentMetadata(person);
-
-        if (persistentMetadata.hasMetadata("channel")) {
-            ConfiguredChannel channel = getChannel(persistentMetadata.getMetadata("channel").toString());
-            if (channel == null) {
-                persistentMetadata.setMetadata("channel", getDefaultChannel().getName());
-                return getDefaultChannel();
-            }
-            return channel;
+    public boolean checkChannelLocked(Person person, ConfiguredChannel channel) {
+        if (channel.getMetadata().hasMetadata("locked", true) && !PermissionContext.hasPermission(person, AdvanciusBungee.getInstance().getCommandManager().getDescription("chatlock").getPermission())) {
+            ConnectionContext.sendMessage(person, ColorUtils.toTextComponent(AdvanciusLang.getInstance().cannotChatLocked));
+            return true;
         }
-        return getDefaultChannel();
+        return false;
+    }
+
+    public ConfiguredChannel getChannel(Person person) {
+        return person.getContextManager().getContext(ChannelContext.class).getChannel();
     }
 
     public ConfiguredChannel getChannel(String name) {

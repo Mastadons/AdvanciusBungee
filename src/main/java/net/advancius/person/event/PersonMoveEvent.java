@@ -5,15 +5,18 @@ import net.advancius.person.Person;
 
 public class PersonMoveEvent extends PersonEvent {
 
-    @Getter private boolean cancellable = false;
+    @Getter
+    private boolean cancellable = false;
 
     public PersonMoveEvent(Person person) {
         super(person);
     }
 
     @Override
-    public void eventCompleted() {}
+    public void eventCompleted() {
+    }
 
     @Override
-    public void eventCancelled() {}
+    public void eventCancelled() {
+    }
 }

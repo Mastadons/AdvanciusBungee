@@ -16,10 +16,18 @@ import java.util.List;
 
 public class MessageGenerateEvent extends ChannelEvent {
 
-    @Getter @Setter private Person sender;
-    @Getter @Setter private String message;
-    @Getter @Setter private List<Person> readers;
-    @Getter @Setter private boolean cancellable = true;
+    @Getter
+    @Setter
+    private Person sender;
+    @Getter
+    @Setter
+    private String message;
+    @Getter
+    @Setter
+    private List<Person> readers;
+    @Getter
+    @Setter
+    private boolean cancellable = true;
 
     public MessageGenerateEvent(ChannelManager channelManager, Person sender, Channel channel, String message, List<Person> readers) {
         super(channel, channelManager);
@@ -29,10 +37,12 @@ public class MessageGenerateEvent extends ChannelEvent {
     }
 
     @Override
-    public void eventCompleted() {}
+    public void eventCompleted() {
+    }
 
     @Override
-    public void eventCancelled() {}
+    public void eventCancelled() {
+    }
 
     public List<ChannelMessage> generate() {
         List<ChannelMessage> messageList = new ArrayList<>();

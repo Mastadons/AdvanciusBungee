@@ -3,7 +3,11 @@ package net.advancius.flag;
 import net.advancius.AdvanciusLogger;
 import org.reflections.Reflections;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -48,7 +52,8 @@ public class FlagManager {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
-    public @interface FlaggedClass {}
+    public @interface FlaggedClass {
+    }
 
     @Repeatable(value = FlagRepeater.class)
     @Retention(RetentionPolicy.RUNTIME)
@@ -56,6 +61,7 @@ public class FlagManager {
     public @interface FlaggedMethod {
 
         DefinedFlag flag();
+
         int priority() default 0;
     }
 

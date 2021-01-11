@@ -3,17 +3,15 @@ package net.advancius.player.context;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.Data;
+import lombok.NonNull;
 import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusConfiguration;
 import net.advancius.file.FileManager;
-import net.advancius.person.Person;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.person.context.PermissionContext;
-import net.advancius.person.context.PersonContext;
 import net.advancius.utils.ColorUtils;
 import net.advancius.utils.Metadata;
 import net.md_5.bungee.api.ChatColor;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,21 +24,22 @@ import java.util.UUID;
 public class PlayerMetadataContext extends MetadataContext {
 
     private Metadata persistentMetadata = new Metadata();
-    private Metadata transientMetadata  = new Metadata();
+    private Metadata transientMetadata = new Metadata();
 
     @Override
     public ChatColor getNameColor() {
         PermissionContext permissionContext = person.getContextManager().getContext(PermissionContext.class);
         String permission = AdvanciusBungee.getInstance().getCommandManager().getDescription("namecolor").getPermission();
 
-        if (!permissionContext.hasPermission(permission)) return ColorUtils.getColor(AdvanciusConfiguration.getInstance().defaultNameColor);
+        if (!permissionContext.hasPermission(permission))
+            return ColorUtils.getColor(AdvanciusConfiguration.getInstance().defaultNameColor);
 
         String colorName = persistentMetadata.getMetadata("namecolor");
         return colorName == null ? ColorUtils.getColor(AdvanciusConfiguration.getInstance().defaultNameColor) : ColorUtils.getColor(colorName);
     }
 
     @Override
-    public void setNameColor(@NotNull ChatColor color) {
+    public void setNameColor(@NonNull ChatColor color) {
         persistentMetadata.setMetadata("namecolor", color.name());
     }
 
@@ -49,14 +48,15 @@ public class PlayerMetadataContext extends MetadataContext {
         PermissionContext permissionContext = person.getContextManager().getContext(PermissionContext.class);
         String permission = AdvanciusBungee.getInstance().getCommandManager().getDescription("chatcolor").getPermission();
 
-        if (!permissionContext.hasPermission(permission)) return ColorUtils.getColor(AdvanciusConfiguration.getInstance().defaultChatColor);
+        if (!permissionContext.hasPermission(permission))
+            return ColorUtils.getColor(AdvanciusConfiguration.getInstance().defaultChatColor);
 
         String colorName = persistentMetadata.getMetadata("chatcolor");
         return colorName == null ? ColorUtils.getColor(AdvanciusConfiguration.getInstance().defaultChatColor) : ColorUtils.getColor(colorName);
     }
 
     @Override
-    public void setChatColor(@NotNull ChatColor color) {
+    public void setChatColor(@NonNull ChatColor color) {
         persistentMetadata.setMetadata("chatcolor", color.name());
     }
 
@@ -166,7 +166,7 @@ public class PlayerMetadataContext extends MetadataContext {
         JsonObject serializedJson = new JsonObject();
 
         serializedJson.add("persistent", new JsonParser().parse(AdvanciusBungee.GSON.toJson(persistentMetadata.getInternal())));
-        serializedJson.add("transient",  new JsonParser().parse(AdvanciusBungee.GSON.toJson( transientMetadata.getInternal())));
+        serializedJson.add("transient", new JsonParser().parse(AdvanciusBungee.GSON.toJson(transientMetadata.getInternal())));
 
         return serializedJson;
     }

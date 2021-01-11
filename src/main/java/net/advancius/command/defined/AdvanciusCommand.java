@@ -12,7 +12,7 @@ import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
 import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.PermissionContext;
-import net.advancius.placeholder.PlaceholderComponent;
+import net.advancius.placeholder.PlaceholderComponentBuilder;
 import net.advancius.utils.ColorUtils;
 
 import java.io.FileNotFoundException;
@@ -20,7 +20,7 @@ import java.io.FileNotFoundException;
 @FlagManager.FlaggedClass
 public class AdvanciusCommand implements CommandListener {
 
-    @FlagManager.FlaggedMethod(priority = 0, flag = DefinedFlag.POST_COMMANDS_LOAD)
+    @FlagManager.FlaggedMethod(flag = DefinedFlag.POST_COMMANDS_LOAD)
     public static void command() {
         AdvanciusBungee.getInstance().getCommandManager().registerListener(new AdvanciusCommand());
     }
@@ -31,9 +31,7 @@ public class AdvanciusCommand implements CommandListener {
             AdvanciusConfiguration.load();
             AdvanciusLang.load();
 
-            PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().reload);
-            component.translateColor();
-            component.send(person);
+            PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().reload).sendColored(person);
         } catch (FileNotFoundException exception) {
             throw new Exception("Encountered error reloading", exception);
         }
@@ -51,9 +49,7 @@ public class AdvanciusCommand implements CommandListener {
     @CommandHandler(description = "advanciuschat")
     public void onCommand(Person person, CommandDescription description, String[] arguments) throws Exception {
         if (arguments.length == 0) {
-            PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().info);
-            component.translateColor();
-            component.send(person);
+            PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().info).sendColored(person);
             return;
         }
 

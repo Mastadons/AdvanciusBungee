@@ -27,7 +27,7 @@ public class DirectMessageCommand implements CommandListener {
         CommandCommons.checkSyntax(arguments.length < 2, "/message <player> <message>");
 
         String message = String.join(" ", Arrays.copyOfRange(arguments, 1, arguments.length));
-        Person reader  = CommandCommons.getPerson(arguments[0]);
+        Person reader = CommandCommons.getPerson(arguments[0]);
 
         CommandCommons.checkCondition(sender.equals(reader), AdvanciusLang.getInstance().cannotMessageSelf);
         DirectMessenger.createDirectMessage(sender, reader, message).sendMessage();

@@ -28,12 +28,16 @@ public class SwearManager implements EventListener {
     public static void swearManager() throws FileNotFoundException {
         SwearManager instance = new SwearManager();
 
+        loadSwearsFile(instance);
+        AdvanciusBungee.getInstance().getEventManager().registerListener(instance);
+        AdvanciusBungee.getInstance().setSwearManager(instance);
+    }
+
+    private static void loadSwearsFile(SwearManager instance) throws FileNotFoundException {
+        instance.swearList.clear();
         File swearsFile = FileManager.getServerFile("swears.txt", "swears.txt");
         Scanner scanner = new Scanner(new FileReader(swearsFile));
         while (scanner.hasNextLine()) instance.swearList.add(scanner.nextLine());
-
-        AdvanciusBungee.getInstance().getEventManager().registerListener(instance);
-        AdvanciusBungee.getInstance().setSwearManager(instance);
     }
 
     @EventHandler(Integer.MIN_VALUE)
@@ -52,8 +56,10 @@ public class SwearManager implements EventListener {
         for (int i = 0; i < components.length; i++) {
             for (String swear : swearList) {
                 if (!components[i].equalsIgnoreCase(swear)) continue;
-                if (show) components[i] = StringUtils.replaceIgnoreCase(components[i], swear, ChatColor.RED + ""   + ChatColor.UNDERLINE + swear + "" + ChatColor.RESET);
-                else      components[i] = StringUtils.replaceIgnoreCase(components[i], swear, ChatColor.RED + StringUtils.repeat('*', components[i].length()) + "" + ChatColor.RESET);
+                if (show)
+                    components[i] = StringUtils.replaceIgnoreCase(components[i], swear, ChatColor.RED + "" + ChatColor.UNDERLINE + swear + "" + ChatColor.RESET);
+                else
+                    components[i] = StringUtils.replaceIgnoreCase(components[i], swear, ChatColor.RED + StringUtils.repeat('*', components[i].length()) + "" + ChatColor.RESET);
                 break;
             }
         }

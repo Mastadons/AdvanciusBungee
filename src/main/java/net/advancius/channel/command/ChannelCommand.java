@@ -12,7 +12,7 @@ import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
 import net.advancius.person.context.ChannelContext;
 import net.advancius.person.context.ConnectionContext;
-import net.advancius.placeholder.PlaceholderComponent;
+import net.advancius.placeholder.PlaceholderComponentBuilder;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -52,27 +52,18 @@ public class ChannelCommand extends ExternalCommand {
 
         if (arguments.length == 0) {
             if (!channel.getMetadata().getMetadataOr("switchable", true)) {
-                PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().incorrectSyntax);
-                placeholderComponent.replace("syntax", "/<channel> <message>");
-                placeholderComponent.translateColor();
-
-                connectionContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+                PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().incorrectSyntax)
+                        .replace("syntax", "/<channel> <message>").sendColored(person);
                 return;
             }
             if (channelContext.getChannel().equals(channel)) {
-                PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().channelAlreadyIn);
-                placeholderComponent.replace("channel", channel);
-                placeholderComponent.translateColor();
-
-                connectionContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+                PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().channelAlreadyIn)
+                        .replace("channel", channel).sendColored(person);
                 return;
             }
             channelContext.setChannel(channel);
-            PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().getChannelChange());
-            placeholderComponent.replace("channel", channel);
-            placeholderComponent.translateColor();
-
-            connectionContext.sendMessage(placeholderComponent.toTextComponentUnsafe());
+            PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().channelChange)
+                    .replace("channel", channel).sendColored(person);
             return;
         }
         String message = String.join(" ", arguments);

@@ -22,12 +22,12 @@ public class PlayerConnectionContext extends ConnectionContext {
     @Override
     public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
         ProxyServer.getInstance().createTitle()
-            .title(ColorUtils.toTextComponent(title))
-            .subTitle(ColorUtils.toTextComponent(subtitle))
-            .fadeIn(fadeIn)
-            .stay(stay)
-            .fadeOut(fadeOut)
-            .send(proxiedPlayer);
+                .title(ColorUtils.toTextComponent(title))
+                .subTitle(ColorUtils.toTextComponent(subtitle))
+                .fadeIn(fadeIn)
+                .stay(stay)
+                .fadeOut(fadeOut)
+                .send(proxiedPlayer);
     }
 
     @Override
@@ -51,5 +51,6 @@ public class PlayerConnectionContext extends ConnectionContext {
     }
 
     @Override
-    public void onPersonSave() {}
+    public void onPersonSave() {
+    }
 }

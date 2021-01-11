@@ -7,7 +7,7 @@ import net.advancius.AdvanciusLogger;
 import net.advancius.file.FileManager;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
-import net.advancius.statistic.adapter.ClassTypeAdapterFactory;
+import net.advancius.statistic.classadapter.ClassTypeAdapterFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,7 +55,9 @@ public class StatisticManager {
         return statistic;
     }
 
-    public boolean hasStatistic(StatisticName name) { return getStatistic(name) != null; }
+    public boolean hasStatistic(StatisticName name) {
+        return getStatistic(name) != null;
+    }
 
     public Statistic getStatistic(String namespace, String name) {
         return getStatistic(new StatisticName(namespace, name));
@@ -79,7 +81,8 @@ public class StatisticManager {
                     registerStatistic(statistic);
 
                     AdvanciusLogger.info("Successfully loaded statistic: " + statistic.getName());
-                } catch (FileNotFoundException exception) {}
+                } catch (FileNotFoundException exception) {
+                }
             }
         }
     }

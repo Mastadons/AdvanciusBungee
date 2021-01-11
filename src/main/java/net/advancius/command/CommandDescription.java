@@ -37,11 +37,11 @@ public class CommandDescription {
     }
 
     public boolean isSubcommandOf(String name) {
-        String[] nameComponents =      name.split("\\.");
+        String[] nameComponents = name.split("\\.");
         String[] selfComponents = this.name.split("\\.");
 
         if (nameComponents.length >= selfComponents.length) return false;
-        for (int i=0; i<nameComponents.length; i++)
+        for (int i = 0; i < nameComponents.length; i++)
             if (!nameComponents[i].equalsIgnoreCase(selfComponents[i])) return false;
         return true;
     }

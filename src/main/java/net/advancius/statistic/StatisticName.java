@@ -9,5 +9,7 @@ public class StatisticName {
     private final String name;
 
     @Override
-    public String toString() { return  namespace + ":" + name; }
+    public String toString() {
+        return namespace + ":" + name;
+    }
 }

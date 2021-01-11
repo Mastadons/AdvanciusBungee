@@ -12,13 +12,13 @@ import java.util.List;
 public class Placeholders {
 
 
-    public static String replace(String original, Object...placeholderObjects) {
+    public static String replace(String original, Object... placeholderObjects) {
         if (placeholderObjects.length == 0) return original;
 
         List<Placeholder> placeholders = createPlaceholders(placeholderObjects);
         StringBuilder replaced = new StringBuilder();
         outer_loop:
-        for (int i=0; i<original.length(); i++) {
+        for (int i = 0; i < original.length(); i++) {
             char character = original.charAt(i);
             if (character == '{') {
                 StringBuilder placeholderText = new StringBuilder();
@@ -42,10 +42,10 @@ public class Placeholders {
         return replaced.toString();
     }
 
-    public static List<Placeholder> createPlaceholders(Object...placeholderObjects) {
+    public static List<Placeholder> createPlaceholders(Object... placeholderObjects) {
         List<Placeholder> placeholders = new ArrayList<>();
-        for (int i=0; i<placeholderObjects.length-1; i++) {
-            if (placeholderObjects[i+1] == null || placeholderObjects[i+1].getClass() == String.class)
+        for (int i = 0; i < placeholderObjects.length - 1; i++) {
+            if (placeholderObjects[i + 1] == null || placeholderObjects[i + 1].getClass() == String.class)
                 placeholders.add(TextPlaceholder.createPlaceholder(placeholderObjects[i], placeholderObjects[++i]));
             else placeholders.add(JsonPlaceholder.createPlaceholder(placeholderObjects[i], placeholderObjects[++i]));
         }
@@ -92,7 +92,7 @@ public class Placeholders {
             if (!components[0].equals(name)) return null;
 
             JsonElement relativeElement = json;
-            for (int i=1; i<components.length; i++) {
+            for (int i = 1; i < components.length; i++) {
                 if (!(relativeElement instanceof JsonObject)) return relativeElement.getAsString();
                 relativeElement = ((JsonObject) relativeElement).get(components[i]);
             }

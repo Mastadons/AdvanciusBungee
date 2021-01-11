@@ -18,10 +18,13 @@ import java.util.List;
 @Data
 public class AdvanciusLang {
 
-    @Getter private static AdvanciusLang instance;
+    @Getter
+    private static AdvanciusLang instance;
 
-    @Getter private static Yaml configurationYaml;
-    @Getter private static File configurationFile;
+    @Getter
+    private static Yaml configurationYaml;
+    @Getter
+    private static File configurationFile;
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = -5)
     public static void load() throws FileNotFoundException {

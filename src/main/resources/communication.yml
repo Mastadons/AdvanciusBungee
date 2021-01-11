@@ -1,0 +1,5 @@
+serverPort: 8080
+idleTimeout: 600000
+keystorePath: keystore.jks
+keystorePassword: 6WYYT8m4NSv3nhZqBTgSDDQE
+authenticationTokens: [MWQwNGQ5ZjgtMDRkNi00MDVlLTgzMDMtY2E2NDY1MzNjYmE0]

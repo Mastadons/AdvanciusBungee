@@ -28,7 +28,7 @@ public class ChatClearCommand implements CommandListener {
         placeholderComponent.translateColor();
 
         for (Person onlinePerson : AdvanciusBungee.getInstance().getPersonManager().getOnlinePersons(o -> !isExempt(o))) {
-            for (int i=0; i<200; i++) ConnectionContext.sendMessage(onlinePerson, new TextComponent(" \n "));
+            for (int i = 0; i < 200; i++) ConnectionContext.sendMessage(onlinePerson, new TextComponent(" \n "));
         }
         AdvanciusBungee.getInstance().getPersonManager().broadcastMessage(placeholderComponent.toTextComponent());
     }

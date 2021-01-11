@@ -10,7 +10,7 @@ import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
 import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.PermissionContext;
-import net.advancius.placeholder.PlaceholderComponent;
+import net.advancius.placeholder.PlaceholderComponentBuilder;
 
 @FlagManager.FlaggedClass
 public class StaffListCommand implements CommandListener {
@@ -24,10 +24,8 @@ public class StaffListCommand implements CommandListener {
     public void onCommand(Person person, CommandDescription description, String argument) {
         ConnectionContext.sendMessage(person, AdvanciusLang.getInstance().staffListHeader);
         for (Person onlinePerson : AdvanciusBungee.getInstance().getPersonManager().getOnlinePersons(this::isPersonStaff)) {
-            PlaceholderComponent component = new PlaceholderComponent(AdvanciusLang.getInstance().staffListLine);
-            component.replace("person", onlinePerson);
-            component.translateColor();
-            component.send(person);
+            PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().staffListLine)
+                    .replace("person", onlinePerson).sendColored(person);
         }
         ConnectionContext.sendMessage(person, AdvanciusLang.getInstance().staffListFooter);
     }

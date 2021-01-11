@@ -19,10 +19,13 @@ import java.util.List;
 @Data
 public class CommandConfiguration {
 
-    @Getter private static CommandConfiguration instance;
+    @Getter
+    private static CommandConfiguration instance;
 
-    @Getter private static Yaml configurationYaml;
-    @Getter private static File configurationFile;
+    @Getter
+    private static Yaml configurationYaml;
+    @Getter
+    private static File configurationFile;
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = 0)
     public static void load() throws FileNotFoundException {

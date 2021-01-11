@@ -1,23 +1,17 @@
 package net.advancius.command;
 
 import net.advancius.AdvanciusBungee;
-import net.advancius.file.FileManager;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
-import net.advancius.flag.FlaggedMethodWrapper;
-import net.advancius.utils.Reflection;
 import net.md_5.bungee.api.ProxyServer;
-import org.reflections.Reflections;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @FlagManager.FlaggedClass
 public class CommandManager {
 
-    private static final Class<?>[] ARGUMENT_TYPES = new Class<?>[] {String[].class, String.class, CommandFlags.class};
+    private static final Class<?>[] ARGUMENT_TYPES = new Class<?>[]{String[].class, String.class, CommandFlags.class};
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = 10)
     private static void commandManager() {
@@ -100,6 +94,7 @@ public class CommandManager {
         }
         return subcommandList;
     }
+
     public boolean isValidArgumentType(Class<?> argumentType) {
         for (Class<?> type : ARGUMENT_TYPES) if (type.equals(argumentType)) return true;
         return false;

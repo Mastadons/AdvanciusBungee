@@ -13,6 +13,7 @@ public abstract class PersonContext {
     public abstract JsonObject serializeJson();
 
     public abstract void onPersonLoad() throws Exception;
+
     public abstract void onPersonSave() throws Exception;
 
     public abstract String getName();

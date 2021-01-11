@@ -18,7 +18,7 @@ import net.advancius.utils.ColorUtils;
 @FlagManager.FlaggedClass
 public class NicknameCommand implements CommandListener {
 
-    @FlagManager.FlaggedMethod(priority = 0, flag = DefinedFlag.POST_COMMANDS_LOAD)
+    @FlagManager.FlaggedMethod(flag = DefinedFlag.POST_COMMANDS_LOAD)
     public static void command() {
         NicknameCommand command = new NicknameCommand();
         AdvanciusBungee.getInstance().getCommandManager().registerListener(command);

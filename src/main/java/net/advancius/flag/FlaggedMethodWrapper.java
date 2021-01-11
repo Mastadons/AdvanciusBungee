@@ -20,7 +20,9 @@ public class FlaggedMethodWrapper implements Comparable<FlaggedMethodWrapper> {
     public Object invoke() {
         try {
             return Reflection.runMethod(method, clazz);
-        } catch (RuntimeException e) { e.printStackTrace(); }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

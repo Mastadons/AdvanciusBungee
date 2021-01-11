@@ -5,7 +5,7 @@ import lombok.Getter;
 import net.advancius.file.FileManager;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
-import net.md_5.bungee.api.ChatColor;
+import net.advancius.integration.discord.DiscordIntegrationConfiguration;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 import org.yaml.snakeyaml.introspector.BeanAccess;
@@ -13,6 +13,7 @@ import org.yaml.snakeyaml.introspector.BeanAccess;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,10 +21,13 @@ import java.util.Map;
 @Data
 public class AdvanciusConfiguration {
 
-    @Getter private static AdvanciusConfiguration instance;
+    @Getter
+    private static AdvanciusConfiguration instance;
 
-    @Getter private static Yaml configurationYaml;
-    @Getter private static File configurationFile;
+    @Getter
+    private static Yaml configurationYaml;
+    @Getter
+    private static File configurationFile;
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = 0)
     public static void load() throws FileNotFoundException {
@@ -61,4 +65,6 @@ public class AdvanciusConfiguration {
     public long eightBallCooldown;
 
     public int port;
+
+    public DiscordIntegrationConfiguration discordIntegration;
 }

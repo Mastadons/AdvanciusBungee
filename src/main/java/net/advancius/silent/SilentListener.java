@@ -75,7 +75,8 @@ public class SilentListener implements EventListener {
         for (Person onlinePerson : AdvanciusBungee.getInstance().getPersonManager().getOnlinePersons()) {
             PermissionContext permissionContext = onlinePerson.getContextManager().getContext(PermissionContext.class);
 
-            if (!permissionContext.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("silent").getPermission())) continue;
+            if (!permissionContext.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("silent").getPermission()))
+                continue;
             onlinePerson.getContextManager().getContext(ConnectionContext.class).sendMessage(component);
         }
     }

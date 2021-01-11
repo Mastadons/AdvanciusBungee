@@ -7,7 +7,12 @@ import net.advancius.flag.FlagManager;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.*;
+import java.nio.file.CopyOption;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 
 @FlagManager.FlaggedClass
@@ -42,7 +47,9 @@ public class FileManager {
             if (!origin.exists()) throw new IllegalArgumentException("Origin file does not exist.");
             target.createNewFile();
             Files.copy(origin.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) { throw new RuntimeException(e); }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void cloneDirectory(Path source, Path target, CopyOption... options) throws IOException {
