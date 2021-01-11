@@ -56,8 +56,10 @@ public class SwearManager implements EventListener {
         for (int i = 0; i < components.length; i++) {
             for (String swear : swearList) {
                 if (!components[i].equalsIgnoreCase(swear)) continue;
-                if (show) components[i] = StringUtils.replaceIgnoreCase(components[i], swear, ChatColor.RED + ""   + ChatColor.UNDERLINE + swear + "" + ChatColor.RESET);
-                else      components[i] = StringUtils.replaceIgnoreCase(components[i], swear, ChatColor.RED + StringUtils.repeat('*', components[i].length()) + "" + ChatColor.RESET);
+                if (show)
+                    components[i] = StringUtils.replaceIgnoreCase(components[i], swear, ChatColor.RED + "" + ChatColor.UNDERLINE + swear + "" + ChatColor.RESET);
+                else
+                    components[i] = StringUtils.replaceIgnoreCase(components[i], swear, ChatColor.RED + StringUtils.repeat('*', components[i].length()) + "" + ChatColor.RESET);
                 break;
             }
         }

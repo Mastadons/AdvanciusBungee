@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.Getter;
 import net.advancius.AdvanciusLogger;
 import net.advancius.channel.configured.ConfiguredChannel;
-import net.advancius.command.CommandDescription;
 import net.advancius.file.FileManager;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
@@ -21,10 +20,13 @@ import java.util.List;
 @Data
 public class ChannelConfiguration {
 
-    @Getter private static ChannelConfiguration instance;
+    @Getter
+    private static ChannelConfiguration instance;
 
-    @Getter private static Yaml configurationYaml;
-    @Getter private static File configurationFile;
+    @Getter
+    private static Yaml configurationYaml;
+    @Getter
+    private static File configurationFile;
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = 0)
     public static void load() throws FileNotFoundException {

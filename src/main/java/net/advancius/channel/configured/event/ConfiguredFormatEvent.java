@@ -9,13 +9,18 @@ import net.advancius.placeholder.PlaceholderComponent;
 @AllArgsConstructor
 public class ConfiguredFormatEvent extends AbstractEvent {
 
-    @Getter private ChannelMessage message;
-    @Getter private PlaceholderComponent component;
-    @Getter private final boolean cancellable = false;
+    @Getter
+    private ChannelMessage message;
+    @Getter
+    private PlaceholderComponent component;
+    @Getter
+    private final boolean cancellable = false;
 
     @Override
-    public void eventCompleted() {}
+    public void eventCompleted() {
+    }
 
     @Override
-    public void eventCancelled() {}
+    public void eventCancelled() {
+    }
 }

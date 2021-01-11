@@ -11,14 +11,12 @@ public class PlaceholderComponentBuilder {
     private final PlaceholderComponent placeholderComponent;
 
     public static PlaceholderComponentBuilder create(String text) {
-        return new PlaceholderComponentBuilder(text);
+        return new PlaceholderComponentBuilder(new PlaceholderComponent(text));
     }
 
     public static PlaceholderComponentBuilder create(PlaceholderComponent placeholderComponent) {
         return new PlaceholderComponentBuilder(placeholderComponent);
     }
-
-    public PlaceholderComponentBuilder(String text) { this.placeholderComponent = new PlaceholderComponent(text); }
 
     public PlaceholderComponentBuilder replace(String original, Object replacement) {
         placeholderComponent.replace(original, replacement);

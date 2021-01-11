@@ -2,22 +2,21 @@ package net.advancius.person.event;
 
 import lombok.Getter;
 import net.advancius.person.Person;
-import net.advancius.player.context.BungeecordContext;
 
 public class PersonJoinEvent extends PersonEvent {
 
-    @Getter private boolean cancellable = true;
+    @Getter
+    private boolean cancellable = false;
 
     public PersonJoinEvent(Person person) {
         super(person);
     }
 
     @Override
-    public void eventCompleted() {}
+    public void eventCompleted() {
+    }
 
     @Override
     public void eventCancelled() {
-        BungeecordContext bungeecordContext = person.getContextManager().getContext("bungeecord");
-        if (bungeecordContext.getProxiedPlayer().isConnected()) bungeecordContext.getProxiedPlayer().disconnect();
     }
 }

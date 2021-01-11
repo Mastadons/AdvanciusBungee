@@ -7,28 +7,21 @@ import net.advancius.AdvanciusLogger;
 import net.advancius.channel.configured.ConfiguredChannel;
 import net.advancius.channel.message.ChannelMessage;
 import net.advancius.channel.message.event.MessageGenerateEvent;
-import net.advancius.communication.CommunicationHandler;
-import net.advancius.communication.CommunicationListener;
-import net.advancius.communication.CommunicationPacket;
-import net.advancius.communication.client.Client;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
 import net.advancius.person.context.ChannelContext;
 import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.PermissionContext;
-import net.advancius.protocol.Protocol;
 import net.advancius.utils.ColorUtils;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.plugin.Listener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @FlagManager.FlaggedClass
-public class ChannelManager implements Listener, CommunicationListener {
+public class ChannelManager implements Listener {
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = 15)
     private static void channelManager() {

@@ -52,6 +52,6 @@ public class EightBallCommand implements CommandListener {
 
     private static String randomEightBallResponse() {
         List<String> responses = AdvanciusLang.getInstance().eightBallResponses;
-        return responses.get((int)(Math.random() * responses.size()));
+        return responses.get((int) (Math.random() * responses.size()));
     }
 }

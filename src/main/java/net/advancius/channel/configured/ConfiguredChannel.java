@@ -2,11 +2,8 @@ package net.advancius.channel.configured;
 
 import lombok.Data;
 import net.advancius.channel.Channel;
-import net.advancius.channel.ChannelFormatter;
-import net.advancius.channel.ChannelGuard;
 import net.advancius.utils.Metadata;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Data

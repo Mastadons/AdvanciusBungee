@@ -7,6 +7,7 @@ import net.advancius.channel.configured.ConfiguredChannel;
 public abstract class ChannelContext extends PersonContext {
 
     public abstract ConfiguredChannel getChannel();
+
     public abstract void setChannel(ConfiguredChannel channel);
 
     @Override

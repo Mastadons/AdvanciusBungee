@@ -2,26 +2,32 @@ package net.advancius.communication;
 
 import lombok.Data;
 import net.advancius.AdvanciusBungee;
-import net.advancius.AdvanciusConfiguration;
 import net.advancius.AdvanciusLogger;
-import net.advancius.communication.client.Client;
-import net.advancius.communication.client.ClientConnector;
-import net.advancius.communication.client.ClientCredentials;
-import net.advancius.encryption.AsymmetricEncryption;
+import net.advancius.communication.exception.PacketListenerException;
+import net.advancius.communication.exception.UnhandledPacketException;
+import net.advancius.communication.identifier.Identifier;
+import net.advancius.communication.packet.PacketHandlerMethod;
+import net.advancius.communication.packet.PacketListener;
+import net.advancius.communication.packet.Packet;
+import net.advancius.communication.servlet.EventsServlet;
+import net.advancius.communication.servlet.PacketServlet;
+import net.advancius.communication.session.SessionManager;
+import net.advancius.file.FileManager;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
-import net.md_5.bungee.api.config.ServerInfo;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 @Data
@@ -29,111 +35,84 @@ import java.util.logging.Level;
 public class CommunicationManager {
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = 5)
-    private static void loadChannelManager() throws IOException, NoSuchAlgorithmException {
+    private static void loadChannelManager() throws Exception {
         AdvanciusLogger.info("Loading ChannelManager");
         CommunicationManager instance = new CommunicationManager();
-        instance.encryptionKeypair = AsymmetricEncryption.AsymmetricEncryptionKeypair.generateKeypair();
-        instance.startCommunication();
+        instance.startCommunicationServer();
 
         AdvanciusBungee.getInstance().setCommunicationManager(instance);
     }
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_SAVE, priority = 100)
-    private static void saveChannelManager() throws IOException, InterruptedException {
+    private static void saveChannelManager() throws Exception {
         AdvanciusLogger.info("Saving ChannelManager");
         CommunicationManager instance = AdvanciusBungee.getInstance().getCommunicationManager();
-        instance.stopCommunication();
+        instance.stopCommunicationServer();
     }
 
-    private AsymmetricEncryption.AsymmetricEncryptionKeypair encryptionKeypair;
+    private final SessionManager sessionManager = new SessionManager();
 
-    private final RequestManager requestManager = new RequestManager();
+    private Server server;
 
-    private final List<CommunicationListener> listenerList = new ArrayList<>();
+    private final List<PacketListener> listenerList = new ArrayList<>();
 
-    private final List<UUID> usedIds = Collections.synchronizedList(new ArrayList<>());
+    public void startCommunicationServer() throws Exception {
+        QueuedThreadPool threadPool = new QueuedThreadPool(100, 10);
+        server = new Server(threadPool);
 
-    private ServerSocket serverSocket;
-    private ClientConnector clientConnector;
+        HttpConfiguration configuration = new HttpConfiguration();
+        configuration.addCustomizer(new SecureRequestCustomizer());
 
-    private final List<Client> clientList = new ArrayList<>();
+        SslContextFactory contextFactory = new SslContextFactory();
+        contextFactory.setKeyStorePath(FileManager.getServerFile(CommunicationConfiguration.getInstance().keystorePath).getPath());
+        contextFactory.setKeyStorePassword(CommunicationConfiguration.getInstance().keystorePassword);
 
-    public void startCommunication() throws IOException {
-        AdvanciusLogger.info("Attempting to start server on port " + AdvanciusConfiguration.getInstance().port);
-        serverSocket = new ServerSocket(AdvanciusConfiguration.getInstance().port);
-        AdvanciusLogger.info("Started server, initializing client connector.");
+        ServerConnector secureConnector = new ServerConnector(server, new SslConnectionFactory(contextFactory, "http/1.1"), new HttpConnectionFactory(configuration));
+        secureConnector.setPort(CommunicationConfiguration.getInstance().serverPort);
+        secureConnector.setIdleTimeout(CommunicationConfiguration.getInstance().idleTimeout);
 
-        clientConnector = new ClientConnector(this);
-        clientConnector.start();
-        AdvanciusLogger.info("Started client connector.");
+        ServletHandler handler = new ServletHandler();
+        handler.addServletWithMapping(EventsServlet.class, "/events");
+        handler.addServletWithMapping(PacketServlet.class, "/packet");
+
+        server.setConnectors(new Connector[] { secureConnector });
+        server.setHandler(handler);
+        server.start();
     }
 
-    public void stopCommunication() throws IOException {
-        clientConnector.stop();
+    public void stopCommunicationServer() throws Exception {
+        sessionManager.terminateSessions();
 
-        new ArrayList<>(clientList).forEach(Client::disconnect);
-        clientList.clear();
-        AdvanciusLogger.info("Disconnected all clients");
-
-        serverSocket.close();
-        AdvanciusLogger.info("Stopped communication server");
+        server.stop();
     }
 
-    public void handleReadPacket(Client client, CommunicationPacket communicationPacket) {
-        if (packetExists(communicationPacket)) return;
-        if (requestManager.handleRequest(communicationPacket)) return;
+    public boolean isAuthentic(String authenticationToken) {
+        if (authenticationToken == null) return false;
 
-        AdvanciusLogger.log(Level.INFO, "[Network] (%s) Incoming packet(%s) with code %d",
-                client.getCompleteName(), communicationPacket.getId().toString(), communicationPacket.getCode());
-
-        listenerList.forEach(listener -> listener.getListenerMethods(communicationPacket.getCode()).forEach(method -> method.executeMethod(client, communicationPacket)));
+        return CommunicationConfiguration.getInstance().authenticationTokens.contains(authenticationToken);
     }
 
-    private boolean packetExists(CommunicationPacket communicationPacket) {
-        if (usedIds.contains(communicationPacket.getId())) return true;
-        usedIds.add(communicationPacket.getId());
-        return false;
-    }
+    public void handlePacket(Identifier identifier, Packet packet) throws UnhandledPacketException, PacketListenerException {
+        AdvanciusLogger.log(Level.INFO, "Client [%s] packet received: %s", identifier, packet.getType());
+        for (PacketListener listener : listenerList) {
+            PacketHandlerMethod handlerMethod = listener.getHandlerMethod(packet.getType());
+            if (handlerMethod == null) continue;
 
-    public Client getClientFromServer(ServerInfo serverInfo) {
-        for (Client client : clientList) {
-            if (client.getCredentials() == null) continue;
-            if (client.getCredentials().isInternal() && client.getCredentials().getName().equalsIgnoreCase(serverInfo.getName()))
-                return client;
+            try {
+                handlerMethod.executeMethod(identifier, packet);
+                return;
+            } catch (Exception exception) {
+                throw new PacketListenerException(listener, handlerMethod, packet, exception);
+            }
         }
-        return null;
+        throw new UnhandledPacketException(packet);
     }
 
-    public Client getClient(String key) {
-        for (Client client : clientList) {
-            if (client.getCredentials() == null) continue;
-            if (client.getCredentials().getKey().equals(key)) return client;
-        }
-        return null;
-    }
-
-    public ClientCredentials getCredentials(String key) {
-        for (ClientCredentials credentials : CredentialsConfiguration.getInstance().credentials.values()) {
-            if (credentials.getKey().equals(key)) return credentials;
-        }
-        return null;
-    }
-
-
-
-    public void registerListener(CommunicationListener listener) {
+    public void registerListener(PacketListener listener) {
         listenerList.add(listener);
     }
 
-    public void unregisterListener(CommunicationListener listener) {
+    public void unregisterListener(PacketListener listener) {
         listenerList.remove(listener);
-    }
-
-    public void registerClient(Client client) {
-        clientList.add(client);
-    }
-
-    public void unregisterClient(Client client) {
-        clientList.remove(client);
     }
 }

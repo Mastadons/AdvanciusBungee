@@ -10,7 +10,6 @@ import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
 import net.advancius.person.context.ConnectionContext;
 import net.advancius.person.context.PermissionContext;
-import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.placeholder.PlaceholderComponentBuilder;
 
 @FlagManager.FlaggedClass

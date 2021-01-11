@@ -44,8 +44,10 @@ public class PlayerChannelContext extends ChannelContext {
     }
 
     @Override
-    public void onPersonLoad() {}
+    public void onPersonLoad() {
+    }
 
     @Override
-    public void onPersonSave() {}
+    public void onPersonSave() {
+    }
 }

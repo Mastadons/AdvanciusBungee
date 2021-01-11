@@ -1,4 +1,3 @@
-port: 4452
 debugExceptions: true
 serverProcessing: ["server_b"]
 defaultChatColor: WHITE

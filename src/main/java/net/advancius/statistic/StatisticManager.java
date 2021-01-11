@@ -55,7 +55,9 @@ public class StatisticManager {
         return statistic;
     }
 
-    public boolean hasStatistic(StatisticName name) { return getStatistic(name) != null; }
+    public boolean hasStatistic(StatisticName name) {
+        return getStatistic(name) != null;
+    }
 
     public Statistic getStatistic(String namespace, String name) {
         return getStatistic(new StatisticName(namespace, name));
@@ -79,7 +81,8 @@ public class StatisticManager {
                     registerStatistic(statistic);
 
                     AdvanciusLogger.info("Successfully loaded statistic: " + statistic.getName());
-                } catch (FileNotFoundException exception) {}
+                } catch (FileNotFoundException exception) {
+                }
             }
         }
     }

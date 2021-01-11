@@ -14,6 +14,7 @@ public class EventListenerMethod {
     public void executeMethod(Event event) {
         Reflection.runMethod(method, listener, event);
     }
+
     public <T extends Event> Class<T> getEventClass() {
         return (Class<T>) method.getParameterTypes()[0];
     }

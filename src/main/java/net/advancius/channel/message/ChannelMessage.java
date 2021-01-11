@@ -33,7 +33,7 @@ public class ChannelMessage {
 
         MessageFormatEvent formatEvent = AdvanciusBungee.getInstance().getEventManager().generateEvent(MessageFormatEvent.class, this, channel.getDefaultFormatter());
         AdvanciusBungee.getInstance().getEventManager().executeEvent(formatEvent);
-        
+
         ChannelFormatter formatter = formatEvent.getFormatter();
         TextComponent formattedMessage = formatter.format(this);
 

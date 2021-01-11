@@ -8,14 +8,16 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 public class InternalCommand extends Command {
 
-    @Getter private final CommandDescription description;
-    @Getter private final CommandListener listener;
-    @Getter private final CommandHandlerMethod handlerMethod;
+    @Getter
+    private final CommandDescription description;
+    @Getter
+    private final CommandListener listener;
+    @Getter
+    private final CommandHandlerMethod handlerMethod;
 
     public InternalCommand(CommandDescription description, CommandListener listener, CommandHandlerMethod handlerMethod) {
         super(description.getName(), description.getPermission(), description.getAliases().toArray(new String[0]));
@@ -45,7 +47,7 @@ public class InternalCommand extends Command {
         InternalCommand subcommand = null;
         String subcommandName = description.getName();
         int argumentIndex = 0;
-        for (;argumentIndex<arguments.length; argumentIndex++) {
+        for (; argumentIndex < arguments.length; argumentIndex++) {
             subcommandName += "." + arguments[argumentIndex];
             InternalCommand command = AdvanciusBungee.getInstance().getCommandManager().getInternalCommand(subcommandName);
             if (command == null) break;

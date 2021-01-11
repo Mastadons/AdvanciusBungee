@@ -3,6 +3,7 @@ package net.advancius.listener;
 import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusConfiguration;
 import net.advancius.AdvanciusLang;
+import net.advancius.event.Event;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
@@ -12,7 +13,6 @@ import net.advancius.person.context.PermissionContext;
 import net.advancius.person.event.PersonJoinEvent;
 import net.advancius.person.event.PersonMoveEvent;
 import net.advancius.person.event.PersonQuitEvent;
-import net.advancius.event.Event;
 import net.advancius.placeholder.PlaceholderComponent;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -77,7 +77,8 @@ public class DefaultBungeecordListener implements Listener {
             MetadataContext metadataContext = onlinePerson.getContextManager().getContext(MetadataContext.class);
 
             if (onlinePerson.equals(person)) continue;
-            if (!permissionContext.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("commandspy").getPermission())) continue;
+            if (!permissionContext.hasPermission(AdvanciusBungee.getInstance().getCommandManager().getDescription("commandspy").getPermission()))
+                continue;
             if (!metadataContext.isCommandSpy()) continue;
 
             PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().commandSpy);

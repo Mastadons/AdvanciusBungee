@@ -3,7 +3,6 @@ package net.advancius.channel.configured;
 import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusLang;
 import net.advancius.person.Person;
-import net.advancius.placeholder.PlaceholderComponent;
 import net.advancius.placeholder.PlaceholderComponentBuilder;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -31,7 +30,8 @@ public class ChannelCommand extends Command {
 
     private static String[] getCommandAliases(ConfiguredChannel channel) {
         List<String> aliases = new ArrayList<>();
-        if (channel.getMetadata().hasMetadata("aliases")) aliases = (List<String>) channel.getMetadata().getMetadata("aliases");
+        if (channel.getMetadata().hasMetadata("aliases"))
+            aliases = (List<String>) channel.getMetadata().getMetadata("aliases");
 
         return aliases.toArray(new String[0]);
     }

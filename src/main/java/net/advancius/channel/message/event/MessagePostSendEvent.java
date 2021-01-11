@@ -6,8 +6,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class MessagePostSendEvent extends ChannelMessageEvent {
 
-    @Getter private final TextComponent formattedMessage;
-    @Getter private final boolean cancellable = false;
+    @Getter
+    private final TextComponent formattedMessage;
+    @Getter
+    private final boolean cancellable = false;
 
     public MessagePostSendEvent(ChannelMessage message, TextComponent formattedMessage) {
         super(message);
@@ -15,8 +17,10 @@ public class MessagePostSendEvent extends ChannelMessageEvent {
     }
 
     @Override
-    public void eventCompleted() {}
+    public void eventCompleted() {
+    }
 
     @Override
-    public void eventCancelled() {}
+    public void eventCancelled() {
+    }
 }

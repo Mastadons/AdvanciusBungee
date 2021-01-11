@@ -2,31 +2,33 @@ package net.advancius.listener.communication;
 
 import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusLang;
-import net.advancius.communication.CommunicationHandler;
-import net.advancius.communication.CommunicationListener;
-import net.advancius.communication.CommunicationPacket;
-import net.advancius.communication.client.Client;
+import net.advancius.communication.identifier.Identifier;
+import net.advancius.communication.packet.PacketHandler;
+import net.advancius.communication.packet.PacketListener;
+import net.advancius.communication.packet.Packet;
+import net.advancius.communication.session.Session;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.context.PermissionContext;
 import net.advancius.placeholder.PlaceholderComponent;
-import net.advancius.protocol.Protocol;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 
+import java.io.IOException;
+
 @FlagManager.FlaggedClass
-public class ClientCrossCommand implements CommunicationListener {
+public class ClientCrossCommand implements PacketListener {
 
     @FlagManager.FlaggedMethod(flag = DefinedFlag.PLUGIN_LOAD, priority = 15)
     public static void load() {
         AdvanciusBungee.getInstance().getCommunicationManager().registerListener(new ClientCrossCommand());
     }
 
-    @CommunicationHandler(code = Protocol.CLIENT_CROSS_COMMAND)
-    public void onCrossServerCommand(Client client, CommunicationPacket communicationPacket) {
-        String serverName = communicationPacket.getMetadata().getMetadata("server");
-        String command = communicationPacket.getMetadata().getMetadata("command");
-        String sender = communicationPacket.getMetadata().getMetadata("sender");
+    @PacketHandler(packetType = "cross_command")
+    public void onCrossServerCommand(Identifier clientIdentifier, Packet packet) throws IOException {
+        String serverName = packet.getMetadata().getMetadata("server");
+        String command = packet.getMetadata().getMetadata("command");
+        String sender = packet.getMetadata().getMetadata("sender");
 
         if (serverName.equalsIgnoreCase("Bungee")) {
             ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
@@ -34,16 +36,16 @@ public class ClientCrossCommand implements CommunicationListener {
         }
         ServerInfo server = ProxyServer.getInstance().getServerInfo(serverName);
 
-        CommunicationPacket communicationResponse = CommunicationPacket.generatePacket(Protocol.SERVER_CROSS_COMMAND);
-        communicationResponse.getMetadata().setMetadata("command", command);
+        Packet redirect = Packet.generatePacket("execute_command");
+        redirect.getMetadata().setMetadata("command", command);
 
-        Client recipient = AdvanciusBungee.getInstance().getCommunicationManager().getClientFromServer(server);
-        recipient.sendPacket(communicationResponse);
+        Session session = AdvanciusBungee.getInstance().getCommunicationManager().getSessionManager().getSession(server);
+        session.sendPacket(redirect);
 
         PlaceholderComponent placeholderComponent = new PlaceholderComponent(AdvanciusLang.getInstance().crossServer);
-        placeholderComponent.replace("client", client);
+        placeholderComponent.replace("client", clientIdentifier);
         placeholderComponent.replace("sender", sender);
-        placeholderComponent.replace("recipient", recipient);
+        placeholderComponent.replace("recipient", session.getIdentifier());
         placeholderComponent.replace("command", command);
         placeholderComponent.translateColor();
 

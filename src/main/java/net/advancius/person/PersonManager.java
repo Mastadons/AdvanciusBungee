@@ -2,14 +2,14 @@ package net.advancius.person;
 
 import com.google.gson.JsonParser;
 import net.advancius.AdvanciusBungee;
+import net.advancius.event.Event;
 import net.advancius.file.FileManager;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.context.ConnectionContext;
-import net.advancius.player.PlayerPerson;
 import net.advancius.person.event.PersonLoadEvent;
 import net.advancius.person.event.PersonSaveEvent;
-import net.advancius.event.Event;
+import net.advancius.player.PlayerPerson;
 import net.advancius.utils.Metadata;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -90,7 +90,8 @@ public class PersonManager {
                 if (!persistentMetadata.hasMetadata("last_username")) continue;
                 String username = persistentMetadata.getMetadata("last_username", String.class);
                 if (username.equalsIgnoreCase(name)) return UUID.fromString(personFile.getName().split("\\.")[0]);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         return null;
     }

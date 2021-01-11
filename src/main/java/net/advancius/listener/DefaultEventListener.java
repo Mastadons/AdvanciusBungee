@@ -4,24 +4,25 @@ import litebans.api.Database;
 import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusConfiguration;
 import net.advancius.AdvanciusLang;
+import net.advancius.AdvanciusLogger;
 import net.advancius.channel.configured.ConfiguredChannel;
 import net.advancius.channel.message.event.MessageGenerateEvent;
 import net.advancius.channel.message.event.MessagePostSendEvent;
+import net.advancius.event.EventHandler;
+import net.advancius.event.EventListener;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
-import net.advancius.person.Person;
 import net.advancius.person.context.ConnectionContext;
+import net.advancius.person.context.ContextManager;
 import net.advancius.person.context.MetadataContext;
 import net.advancius.person.context.PermissionContext;
-import net.advancius.player.PlayerPerson;
-import net.advancius.person.context.ContextManager;
 import net.advancius.person.event.PersonJoinEvent;
 import net.advancius.person.event.PersonLoadEvent;
 import net.advancius.person.event.PersonMoveEvent;
 import net.advancius.person.event.PersonQuitEvent;
+import net.advancius.person.event.PersonSaveEvent;
 import net.advancius.placeholder.PlaceholderComponent;
-import net.advancius.event.EventHandler;
-import net.advancius.event.EventListener;
+import net.advancius.player.PlayerPerson;
 import net.advancius.player.context.PlayerChannelContext;
 import net.advancius.player.context.PlayerConnectionContext;
 import net.advancius.player.context.PlayerMetadataContext;
@@ -31,8 +32,6 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-
-import java.util.Arrays;
 
 @FlagManager.FlaggedClass
 public class DefaultEventListener implements EventListener {
@@ -52,6 +51,15 @@ public class DefaultEventListener implements EventListener {
         contextManager.addContext(PlayerPermissionContext.class, 1);
         contextManager.addContext(PlayerMetadataContext.class, 2);
         contextManager.addContext(PlayerChannelContext.class, 3);
+    }
+
+    @EventHandler(Integer.MAX_VALUE)
+    public void onPersonSave(PersonSaveEvent event) {
+        if (!(event.getPerson() instanceof PlayerPerson)) return;
+
+        PlayerConnectionContext connectionContext = event.getPerson().getContextManager().getContext(PlayerConnectionContext.class);
+
+        AdvanciusLogger.info("Person " + connectionContext.getProxiedPlayer().getName() + " has saved!");
     }
 
     @EventHandler(Integer.MAX_VALUE)
@@ -139,6 +147,7 @@ public class DefaultEventListener implements EventListener {
 
         if (Commons.onCooldown(event.getSender(), previous, cooldown, true))
             event.setCancelled(true);
-        else MetadataContext.getTransientMetadata(event.getSender()).setMetadata(channel.getName() + "-lastsent", System.currentTimeMillis());
+        else
+            MetadataContext.getTransientMetadata(event.getSender()).setMetadata(channel.getName() + "-lastsent", System.currentTimeMillis());
     }
 }

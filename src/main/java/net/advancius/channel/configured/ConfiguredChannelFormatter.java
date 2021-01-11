@@ -6,7 +6,6 @@ import net.advancius.channel.ChannelFormatter;
 import net.advancius.channel.configured.event.ConfiguredFormatEvent;
 import net.advancius.channel.message.ChannelMessage;
 import net.advancius.placeholder.PlaceholderComponent;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 @Data

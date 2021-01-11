@@ -3,7 +3,7 @@ package net.advancius.person.event;
 import lombok.Getter;
 import net.advancius.AdvanciusLogger;
 import net.advancius.person.Person;
-import net.advancius.player.context.BungeecordContext;
+import net.advancius.person.context.ConnectionContext;
 
 public class PersonLoadEvent extends PersonEvent {
 
@@ -16,12 +16,14 @@ public class PersonLoadEvent extends PersonEvent {
 
     @Override
     public void eventCompleted() {
-        BungeecordContext bungeecordContext = person.getContextManager().getContext(BungeecordContext.class);
-
         person.getContextManager().loadContexts();
-        AdvanciusLogger.info("Person " + bungeecordContext.getProxiedPlayer().getName() + " has loaded!");
+
+        ConnectionContext connectionContext = person.getContextManager().getContext(ConnectionContext.class);
+
+        AdvanciusLogger.info("Person " + connectionContext.getConnectionName() + " has loaded!");
     }
 
     @Override
-    public void eventCancelled() {}
+    public void eventCancelled() {
+    }
 }
