@@ -110,3 +110,8 @@ commands:
     syntax: "/advanciuschat help"
     description: "Shows you all commands that you can do"
     aliases: []
+  - name: discordmessage
+    permission: advanciuschat.integration.discord
+    syntax: "/discordmessage <message> <webhook>"
+    description: "Sends a message through a discord webhook integration"
+    aliases: ["dcm"]

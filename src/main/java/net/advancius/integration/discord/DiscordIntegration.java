@@ -4,18 +4,10 @@ import com.google.gson.JsonObject;
 import net.advancius.AdvanciusBungee;
 import net.advancius.AdvanciusConfiguration;
 import net.advancius.AdvanciusLogger;
-import net.advancius.channel.configured.ConfiguredChannel;
-import net.advancius.channel.message.event.MessagePostSendEvent;
-import net.advancius.event.EventHandler;
 import net.advancius.event.EventListener;
-import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
-import net.advancius.person.context.MetadataContext;
-import net.advancius.person.event.PersonJoinEvent;
-import net.advancius.person.event.PersonMoveEvent;
-import net.advancius.person.event.PersonQuitEvent;
-import net.advancius.placeholder.PlaceholderComponentBuilder;
-import net.md_5.bungee.api.ChatColor;
+import net.advancius.integration.discord.listener.DiscordListener;
+import net.advancius.placeholder.PlaceholderComponent;
 import net.md_5.bungee.api.ProxyServer;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.Request;
@@ -23,118 +15,84 @@ import org.eclipse.jetty.client.util.StringContentProvider;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @FlagManager.FlaggedClass
 public class DiscordIntegration implements EventListener {
 
-    private static DiscordIntegration instance;
-
-    @FlagManager.FlaggedMethod(priority = 40, flag = DefinedFlag.PLUGIN_LOAD)
-    public static void loadIntegration() throws Exception {
-        AdvanciusLogger.info("Establishing Discord integration.");
-
-        instance = new DiscordIntegration();
-        instance.load();
-    }
-
-    @FlagManager.FlaggedMethod(priority = 0, flag = DefinedFlag.PLUGIN_SAVE)
-    public static void stopIntegration() throws Exception {
-        instance.stop();
-    }
-
     private HttpClient connection;
 
-    private void load() throws Exception {
+    public void load() throws Exception {
         connection = new HttpClient(new SslContextFactory(true));
         connection.start();
 
-        AdvanciusBungee.getInstance().getEventManager().registerListener(this);
+        AdvanciusBungee.getInstance().getEventManager().registerListener(new DiscordListener(this));
     }
 
-    private void stop() throws Exception {
-        connection.stop();
+    public DiscordMessage getConfiguredMessage(String name) {
+        return AdvanciusConfiguration.getInstance().getDiscordIntegration().messages.get(name);
     }
 
-    @EventHandler
-    public void onMessagePostSend(MessagePostSendEvent event) {
-        if (AdvanciusConfiguration.getInstance().discordIntegration == null) return;
-
-        if (!(event.getMessage().getChannel() instanceof ConfiguredChannel)) return;
-        if (!event.getMessage().getSender().equals(event.getMessage().getReader())) return;
-
-        ConfiguredChannel channel = (ConfiguredChannel) event.getMessage().getChannel();
-
-        String message = ChatColor.stripColor(event.getFormattedMessage().toPlainText());
-
-        AdvanciusConfiguration.getInstance().discordIntegration.channelWebhooks.forEach(channelWebhook -> {
-            if (!channel.getName().equalsIgnoreCase(channelWebhook.channel)) return;
-
-            String content = PlaceholderComponentBuilder.create(channelWebhook.message)
-                    .replace("message", message)
-                    .replace("event", event)
-                    .getPlaceholderComponent().getText();
-
-            sendWebhookContent(channelWebhook.url, content);
-        });
+    public String getConfiguredWebhookUrl(String name) {
+        return AdvanciusConfiguration.getInstance().getDiscordIntegration().webhooks.get(name);
     }
 
-    @EventHandler
-    public void onPersonJoin(PersonJoinEvent event) {
-        if (AdvanciusConfiguration.getInstance().discordIntegration == null) return;
-        if (event.getPerson().getContextManager().getContext(MetadataContext.class).isSilent()) return;
-
-        AdvanciusConfiguration.getInstance().discordIntegration.joinWebhooks.forEach(webhook -> {
-            String content = PlaceholderComponentBuilder.create(webhook.message)
-                    .replace("event", event)
-                    .getPlaceholderComponent().getText();
-
-            sendWebhookContent(webhook.url, content);
-        });
-    }
-
-    @EventHandler
-    public void onPersonQuit(PersonQuitEvent event) {
-        if (AdvanciusConfiguration.getInstance().discordIntegration == null) return;
-        if (event.getPerson().getContextManager().getContext(MetadataContext.class).isSilent()) return;
-
-        AdvanciusConfiguration.getInstance().discordIntegration.quitWebhooks.forEach(webhook -> {
-            String content = PlaceholderComponentBuilder.create(webhook.message)
-                    .replace("event", event)
-                    .getPlaceholderComponent().getText();
-
-            sendWebhookContent(webhook.url, content);
-        });
-    }
-
-    @EventHandler
-    public void onPersonMove(PersonMoveEvent event) {
-        if (AdvanciusConfiguration.getInstance().discordIntegration == null) return;
-        if (!MetadataContext.getTransientMetadata(event.getPerson()).hasMetadata("ending_server")) return;
-        if (event.getPerson().getContextManager().getContext(MetadataContext.class).isSilent()) return;
-
-        AdvanciusConfiguration.getInstance().discordIntegration.moveWebhooks.forEach(webhook -> {
-            String content = PlaceholderComponentBuilder.create(webhook.message)
-                    .replace("event", event)
-                    .getPlaceholderComponent().getText();
-
-            sendWebhookContent(webhook.url, content);
-        });
-    }
-
-    private void sendWebhookContent(String url, String content) {
+    public void send(String message, String webhookUrl) {
         ProxyServer.getInstance().getScheduler().runAsync(AdvanciusBungee.getInstance(), () -> {
             try {
-                Request request = connection.POST(url);
+                Request request = connection.POST(webhookUrl);
                 request.header(HttpHeader.CONTENT_TYPE, "application/json");
 
                 JsonObject requestData = new JsonObject();
-                requestData.addProperty("content", content);
+                requestData.addProperty("content", message);
 
                 request.content(new StringContentProvider(requestData.toString()), "application/json");
                 request.send();
+
+                AdvanciusLogger.info("Successfully sent content through discord integration.");
             } catch (Exception exception) {
-                AdvanciusLogger.warn("Encountered exception sending content to discord integration.");
+                AdvanciusLogger.warn("Encountered exception sending content through discord integration.");
                 exception.printStackTrace();
             }
         });
+    }
+
+    public void send(DiscordMessage message, String webhookUrl) {
+        send(message, webhookUrl, new HashMap<>());
+    }
+
+    public void send(DiscordMessage message, String webhookUrl, Map<String, Object> placeholders) {
+        ProxyServer.getInstance().getScheduler().runAsync(AdvanciusBungee.getInstance(), () -> {
+            try {
+                Request request = connection.POST(webhookUrl);
+                request.header(HttpHeader.CONTENT_TYPE, "application/json");
+
+                JsonObject requestData = new JsonObject();
+                requestData.addProperty("content", replacePlaceholders(message.getMessage(), placeholders));
+
+                if (message.getUsername() != null) requestData.addProperty("username", replacePlaceholders(message.getUsername(), placeholders));
+                if (message.getAvatarUrl() != null) requestData.addProperty("avatar_url", message.getAvatarUrl());
+                if (!message.isMentions()) requestData.add("allowed_mentions", DiscordMessage.getUnallowedMentionsJsonObject());
+
+                if (message.getEmbeds() != null) requestData.add("embeds", message.getEmbedsAsJsonArray(placeholders));
+                System.out.println(requestData.toString());
+
+                request.content(new StringContentProvider(requestData.toString()), "application/json");
+                request.send();
+
+                AdvanciusLogger.info("Successfully sent content through discord integration.");
+            } catch (Exception exception) {
+                AdvanciusLogger.warn("Encountered exception sending content through discord integration.");
+                exception.printStackTrace();
+            }
+        });
+    }
+
+    public static String replacePlaceholders(String content, Map<String, Object> placeholders) {
+        PlaceholderComponent component = new PlaceholderComponent(content);
+        placeholders.forEach(component::replace);
+
+        return component.getText();
     }
 }

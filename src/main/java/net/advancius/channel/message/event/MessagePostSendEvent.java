@@ -2,6 +2,8 @@ package net.advancius.channel.message.event;
 
 import lombok.Getter;
 import net.advancius.channel.message.ChannelMessage;
+import net.advancius.utils.ColorUtils;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class MessagePostSendEvent extends ChannelMessageEvent {
@@ -22,5 +24,9 @@ public class MessagePostSendEvent extends ChannelMessageEvent {
 
     @Override
     public void eventCancelled() {
+    }
+
+    public String getPlainText() {
+        return ChatColor.stripColor(formattedMessage.toPlainText());
     }
 }

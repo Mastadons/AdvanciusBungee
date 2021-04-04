@@ -11,7 +11,6 @@ import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
 import net.advancius.person.Person;
 import net.advancius.person.context.ChannelContext;
-import net.advancius.person.context.ConnectionContext;
 import net.advancius.placeholder.PlaceholderComponentBuilder;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -48,22 +47,21 @@ public class ChannelCommand extends ExternalCommand {
         Person person = AdvanciusBungee.getInstance().getPersonManager().getPersonUnsafe(sender);
 
         ChannelContext channelContext = person.getContextManager().getContext(ChannelContext.class);
-        ConnectionContext connectionContext = person.getContextManager().getContext(ConnectionContext.class);
 
         if (arguments.length == 0) {
             if (!channel.getMetadata().getMetadataOr("switchable", true)) {
                 PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().incorrectSyntax)
                         .replace("syntax", "/<channel> <message>").sendColored(person);
-                return;
             }
-            if (channelContext.getChannel().equals(channel)) {
+            else if (channelContext.getChannel().equals(channel)) {
                 PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().channelAlreadyIn)
                         .replace("channel", channel).sendColored(person);
-                return;
             }
-            channelContext.setChannel(channel);
-            PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().channelChange)
-                    .replace("channel", channel).sendColored(person);
+            else {
+                channelContext.setChannel(channel);
+                PlaceholderComponentBuilder.create(AdvanciusLang.getInstance().channelChange)
+                        .replace("channel", channel).sendColored(person);
+            }
             return;
         }
         String message = String.join(" ", arguments);

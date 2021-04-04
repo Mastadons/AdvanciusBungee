@@ -33,3 +33,6 @@ maxNicknameLength: 24
 minNicknameLength: 3
 eightBallChannel: global
 eightBallCooldown: 30000
+discordIntegration:
+  webhooks: {}
+  messages: {}

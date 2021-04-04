@@ -66,5 +66,5 @@ public class AdvanciusConfiguration {
 
     public int port;
 
-    public DiscordIntegrationConfiguration discordIntegration;
+    public DiscordIntegrationConfiguration discordIntegration = new DiscordIntegrationConfiguration();
 }

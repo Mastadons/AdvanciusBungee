@@ -9,4 +9,6 @@ public interface Person {
     UUID getId();
 
     ContextManager getContextManager();
+
+    default String getReducedId() { return getId().toString().replace("-", ""); }
 }

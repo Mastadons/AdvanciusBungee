@@ -60,7 +60,7 @@ public class InternalCommand extends Command {
     }
 
     private boolean isUnhandledInterface(Person person) {
-        return person == null || (person != null && !handlerMethod.getMethod().getParameterTypes()[0].isAssignableFrom(person.getClass()));
+        return person != null && !handlerMethod.getMethod().getParameterTypes()[0].isAssignableFrom(person.getClass());
     }
 
     private Object getArgument(String[] arguments) {

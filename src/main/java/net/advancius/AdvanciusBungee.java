@@ -9,6 +9,7 @@ import net.advancius.communication.CommunicationManager;
 import net.advancius.event.EventManager;
 import net.advancius.flag.DefinedFlag;
 import net.advancius.flag.FlagManager;
+import net.advancius.integration.IntegrationManager;
 import net.advancius.person.PersonManager;
 import net.advancius.statistic.StatisticManager;
 import net.advancius.swear.SwearManager;
@@ -20,30 +21,16 @@ public class AdvanciusBungee extends Plugin {
 
     public static Gson GSON = new Gson();
 
-    @Getter
-    private static AdvanciusBungee instance;
+    @Getter private static AdvanciusBungee instance;
 
-    @Getter
-    @Setter
-    private SwearManager swearManager;
-    @Getter
-    @Setter
-    private CommunicationManager communicationManager;
-    @Getter
-    @Setter
-    private EventManager eventManager;
-    @Getter
-    @Setter
-    private StatisticManager statisticManager;
-    @Getter
-    @Setter
-    private ChannelManager channelManager;
-    @Getter
-    @Setter
-    private CommandManager commandManager;
-    @Getter
-    @Setter
-    private PersonManager personManager;
+    @Getter @Setter private SwearManager swearManager;
+    @Getter @Setter private CommunicationManager communicationManager;
+    @Getter @Setter private EventManager eventManager;
+    @Getter @Setter private StatisticManager statisticManager;
+    @Getter @Setter private ChannelManager channelManager;
+    @Getter @Setter private CommandManager commandManager;
+    @Getter @Setter private PersonManager personManager;
+    @Getter @Setter private IntegrationManager integrationManager;
 
     @Override
     public void onEnable() {

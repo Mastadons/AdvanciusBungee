@@ -1,6 +1,6 @@
 name: AdvanciusBungee
 main: net.advancius.AdvanciusBungee
-version: 1.2.0-SNAPSHOT
+version: 1.2.2-SNAPSHOT
 description: A simple to use plugin designed to handle all of your chatting needs!
 author: Mastadons
 depends: [LuckPerms]

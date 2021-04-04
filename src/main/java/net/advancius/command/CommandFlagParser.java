@@ -30,7 +30,12 @@ public class CommandFlagParser {
                 break;
             }
         }
-        return command.substring(start, equalSign).trim();
+        String content = command.substring(start, equalSign).trim();
+        if (content.startsWith("\"") && content.endsWith("\"")) {
+            if (content.length() > 2) content = content.substring(1, content.length()-1);
+            else content = "";
+        }
+        return content;
     }
 
     private static String getFlagData(String command, int equalSign) {
@@ -49,7 +54,13 @@ public class CommandFlagParser {
                 break;
             }
         }
-        return command.substring(equalSign + 1, end);
+
+        String content = command.substring(equalSign + 1, end);
+        if (content.startsWith("\"") && content.endsWith("\"")) {
+            if (content.length() > 2) content = content.substring(1, content.length()-1);
+            else content = "";
+        }
+        return content;
     }
 }
 

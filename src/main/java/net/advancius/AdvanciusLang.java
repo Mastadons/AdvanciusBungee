@@ -118,4 +118,6 @@ public class AdvanciusLang {
     public String cannotChatMuted;
 
     public String crossServer;
+
+    public String discordMessageSent;
 }
