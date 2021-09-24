@@ -60,22 +60,32 @@ public class CommunicationManager {
         QueuedThreadPool threadPool = new QueuedThreadPool(100, 10);
         server = new Server(threadPool);
 
-        HttpConfiguration configuration = new HttpConfiguration();
-        configuration.addCustomizer(new SecureRequestCustomizer());
+        if (CommunicationConfiguration.getInstance().encryption) {
 
-        SslContextFactory contextFactory = new SslContextFactory();
-        contextFactory.setKeyStorePath(FileManager.getServerFile(CommunicationConfiguration.getInstance().keystorePath).getPath());
-        contextFactory.setKeyStorePassword(CommunicationConfiguration.getInstance().keystorePassword);
+            HttpConfiguration configuration = new HttpConfiguration();
+            configuration.addCustomizer(new SecureRequestCustomizer());
 
-        ServerConnector secureConnector = new ServerConnector(server, new SslConnectionFactory(contextFactory, "http/1.1"), new HttpConnectionFactory(configuration));
-        secureConnector.setPort(CommunicationConfiguration.getInstance().serverPort);
-        secureConnector.setIdleTimeout(CommunicationConfiguration.getInstance().idleTimeout);
+            SslContextFactory contextFactory = new SslContextFactory();
+            contextFactory.setKeyStorePath(FileManager.getServerFile(CommunicationConfiguration.getInstance().keystorePath).getPath());
+            contextFactory.setKeyStorePassword(CommunicationConfiguration.getInstance().keystorePassword);
+
+            ServerConnector secureConnector = new ServerConnector(server, new SslConnectionFactory(contextFactory, "http/1.1"), new HttpConnectionFactory(configuration));
+            secureConnector.setPort(CommunicationConfiguration.getInstance().serverPort);
+            secureConnector.setIdleTimeout(CommunicationConfiguration.getInstance().idleTimeout);
+
+            server.setConnectors(new Connector[]{secureConnector});
+        }
+        else {
+            ServerConnector serverConnector = new ServerConnector(server);
+            serverConnector.setPort(CommunicationConfiguration.getInstance().serverPort);
+            serverConnector.setIdleTimeout(CommunicationConfiguration.getInstance().idleTimeout);
+            server.setConnectors(new Connector[] { serverConnector });
+        }
 
         ServletHandler handler = new ServletHandler();
         handler.addServletWithMapping(EventsServlet.class, "/events");
         handler.addServletWithMapping(PacketServlet.class, "/packet");
 
-        server.setConnectors(new Connector[] { secureConnector });
         server.setHandler(handler);
         server.start();
     }

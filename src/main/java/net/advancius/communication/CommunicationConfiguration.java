@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
-import java.util.Map;
 
 @FlagManager.FlaggedClass
 @Data
@@ -49,4 +48,6 @@ public class CommunicationConfiguration {
     public String keystorePassword;
 
     public List<String> authenticationTokens;
+
+    public boolean encryption;
 }
